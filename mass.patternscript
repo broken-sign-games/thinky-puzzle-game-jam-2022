@@ -1,0 +1,211 @@
+title Isaac and the Conservation of Mass
+author Menderbug
+homepage menderbug.itch.io
+
+game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
+
+========
+OBJECTS
+========
+
+Background
+LIGHTGREEN GREEN
+11111
+01111
+11101
+11111
+10111
+
+Wall
+BROWN DARKBROWN
+00010
+11111
+01000
+11111
+00010
+
+PlayerSprite Player
+Black Orange White Blue
+..000000..
+..000000..
+..111111..
+..111111..
+2222222222
+2222222222
+..333333..
+..333333..
+..33..33..
+..33..33..
+
+Jelly1x1Sprite
+Orange Yellow
+0000000000
+0000000000
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+0000000000
+0000000000
+
+Jelly2x1Sprite:left Jelly2x1Sprite:right
+Orange Yellow
+00000000000000000000
+00000000000000000000
+00................00
+00................00
+00................00
+00................00
+00................00
+00................00
+00000000000000000000
+00000000000000000000
+
+
+Jelly2x1Sprite:up Jelly2x1Sprite:down
+Orange Yellow
+0000000000
+0000000000
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+0000000000
+0000000000
+
+_Connector:directions
+pink
+.....
+.....
+..000
+.....
+.....
+rot:right:>
+
+_Player
+transparent
+
+_Jelly1x1
+transparent
+
+_Jelly2x1:left _Jelly2x1:right
+transparent
+
+_Jelly2x1:up _Jelly2x1:down
+transparent
+
+
+=======
+LEGEND
+=======
+
+. = Background
+# = Wall
+P = PlayerSprite
+* = Jelly1x1Sprite
+│ = Jelly2x1Sprite:up
+─ = Jelly2x1Sprite:right
+
+
+Sprite = PlayerSprite or Jelly1x1Sprite or Jelly2x1Sprite:directions
+
+_Jelly2x1 = _Jelly2x1:directions
+
+_Jelly = _Jelly1x1 or _Jelly2x1
+
+ObjectType = _Jelly or _Player
+
+Pushable = _Jelly or _Player or _Connector:directions
+
+=======
+SOUNDS
+=======
+
+Pushable MOVE 36772507
+
+================
+COLLISIONLAYERS
+================
+
+--<v--
+
+Background
+Sprite, Wall
+
+--
+
+_Player, _Jelly
+
+directions -> _Connector:directions
+
+======
+RULES
+======
+
+(* Clean up *)
+[ _Connector:directions ] -> [ ]
+[ ObjectType ] -> [ ]
+
+(* Expand player *)
+[ moving PlayerSprite ] -> [ moving _Player moving _Connector:right moving _Connector:up ]
+[ PlayerSprite ] -> [ _Player _Connector:right _Connector:up ]
+[ _Player _Connector:> _Connector:^ | no _Player ] -> [ _Player _Connector:> _Connector:^ | _Player _Connector:< _Connector:^ ]
+[ moving _Player ] [ _Player _Connector:directions ] -> [ moving _Player ] [ moving _Player moving _Connector:directions ]
+
+(* Expand 1x1 jellies *)
+[ Jelly1x1Sprite ] -> [ _Jelly1x1 _Connector:right _Connector:up ]
+[ _Jelly1x1 _Connector:> _Connector:^ | ] -> [ _Jelly1x1 _Connector:> _Connector:^ | _Jelly1x1 _Connector:< _Connector:^ ]
+
+(* Expand 2x1 jellies *)
+directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:right _Connector:up ]
+[ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | ] -> [ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | _Jelly2x1:perpendicular _Connector:< _Connector:perpendicular ]
+[ _Jelly2x1:> _Connector:> _Connector:perpendicular | | | ] -> [ _Jelly2x1:> _Connector:> _Connector:perpendicular | _Jelly2x1:> _Connector:> _Connector:< | _Jelly2x1:> _Connector:> _Connector:< | _Jelly2x1:> _Connector:< _Connector:perpendicular ]
+
+(* Push pushables *)
+[ > _Player | Pushable ] -> [ > _Player | > Pushable ]
+
+(* Expand pushing to connected tiles *)
+[ moving _Connector:> | Pushable ] -> [ moving _Connector:> | moving Pushable ]
+
+(((( LATE RULES ))))
+
+(* Render sprites again *)
+late [ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
+late [ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
+late directions [ _Jelly2x1:directions _Connector:right _Connector:up ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
+
+==============
+WINCONDITIONS
+==============
+
+
+=======
+LEVELS
+=======
+
+################
+#..............#
+#..............#
+#..............#
+#..............#
+#........│.....#
+#*.p...........#
+#..............#
+#....*....─....#
+#..............#
+#..............#
+################
