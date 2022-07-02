@@ -4,6 +4,12 @@ homepage menderbug.itch.io
 
 game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
+=====
+TAGS
+=====
+
+LoopSection = ForwardPropagate ProcessMoving ProcessBlocked
+
 ========
 OBJECTS
 ========
@@ -108,6 +114,29 @@ transparent
 _Jelly2x1:up _Jelly2x1:down
 transparent
 
+_Blocked
+pink
+
+_Unprocessed
+red
+
+_Processing
+green
+
+_Pending
+purple
+
+_Processed
+blue
+
+_Temp
+pink
+
+_RerunLoop
+pink
+
+_LoopSection:LoopSection
+white
 
 =======
 LEGEND
@@ -129,13 +158,17 @@ _Jelly = _Jelly1x1 or _Jelly2x1
 
 ObjectType = _Jelly or _Player
 
-Pushable = _Jelly or _Player or _Connector:directions
+RigidMovable = _Jelly1x1 or _Player
+
+Movable = _Jelly or _Player
+
+Status = _Unprocessed or _Processing or _Pending or _Processed
 
 =======
 SOUNDS
 =======
 
-Pushable MOVE 36772507
+Movable MOVE 36772507
 
 ================
 COLLISIONLAYERS
@@ -149,44 +182,97 @@ Sprite, Wall
 --
 
 _Player, _Jelly
-
+_Blocked
+_Temp
+_RerunLoop
 directions -> _Connector:directions
+Status
+_LoopSection:LoopSection
 
 ======
 RULES
 ======
 
-(* Clean up *)
+( Clean up )
 [ _Connector:directions ] -> [ ]
 [ ObjectType ] -> [ ]
 
-(* Expand player *)
-[ moving PlayerSprite ] -> [ moving _Player moving _Connector:right moving _Connector:up ]
+( Expand player )
+[ moving PlayerSprite ] -> [ moving _Player _Connector:right _Connector:up ]
 [ PlayerSprite ] -> [ _Player _Connector:right _Connector:up ]
 [ _Player _Connector:> _Connector:^ | no _Player ] -> [ _Player _Connector:> _Connector:^ | _Player _Connector:< _Connector:^ ]
-[ moving _Player ] [ _Player _Connector:directions ] -> [ moving _Player ] [ moving _Player moving _Connector:directions ]
+[ moving _Player ] [ _Player ] -> [ moving _Player ] [ moving _Player ]
 
-(* Expand 1x1 jellies *)
+( Expand 1x1 jellies )
 [ Jelly1x1Sprite ] -> [ _Jelly1x1 _Connector:right _Connector:up ]
 [ _Jelly1x1 _Connector:> _Connector:^ | ] -> [ _Jelly1x1 _Connector:> _Connector:^ | _Jelly1x1 _Connector:< _Connector:^ ]
 
-(* Expand 2x1 jellies *)
+( Expand 2x1 jellies )
 directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:right _Connector:up ]
 [ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | ] -> [ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | _Jelly2x1:perpendicular _Connector:< _Connector:perpendicular ]
-[ _Jelly2x1:> _Connector:> _Connector:perpendicular | | | ] -> [ _Jelly2x1:> _Connector:> _Connector:perpendicular | _Jelly2x1:> _Connector:> _Connector:< | _Jelly2x1:> _Connector:> _Connector:< | _Jelly2x1:> _Connector:< _Connector:perpendicular ]
+[ _Jelly2x1:> _Connector:> _Connector:perpendicular no _Temp | | | ] -> [ _Jelly2x1:> _Connector:> _Connector:perpendicular | _Jelly2x1:> _Connector:> _Connector:perpendicular _Connector:< _Temp | _Jelly2x1:> _Connector:> _Connector:perpendicular _Connector:< _Temp | _Jelly2x1:> _Connector:< _Connector:perpendicular ]
+[ _Temp ] -> [ ]
 
-(* Push pushables *)
-[ > _Player | Pushable ] -> [ > _Player | > Pushable ]
+[ Movable ] -> [ Movable _Unprocessed ]
 
-(* Expand pushing to connected tiles *)
-[ moving _Connector:> | Pushable ] -> [ moving _Connector:> | moving Pushable ]
+( Can't nest loops in PS, so we have to build our put everything in a single loop and group things manually )
+random [ ] -> [ _LoopSection:ForwardPropagate ]
+
+startloop
+  ( Forward propagate movement intent )
+  
+  ( Walls immediately block movement )
+  [ _LoopSection:ForwardPropagate ] [ > Movable | Wall ] -> [ _LoopSection:ForwardPropagate _RerunLoop ] [ Movable > _Blocked | Wall ]
+  [ _LoopSection:ForwardPropagate ] [ Movable moving _Blocked _Connector:> | Movable no _Blocked ] -> [ _LoopSection:ForwardPropagate  _RerunLoop ] [ Movable moving _Blocked _Connector:> | stationary Movable moving _Blocked ]
+
+  ( Propagate pushing to movables )
+  [ _LoopSection:ForwardPropagate ] [ > Movable _Processing no _Connector:> | Movable _Unprocessed ] -> [ _LoopSection:ForwardPropagate _RerunLoop ] [ > Movable _Pending | > Movable _Processing  ]
+  [ _LoopSection:ForwardPropagate ] [ Movable _Pending _Connector:> | Movable _Processing ] -> [ _LoopSection:ForwardPropagate _RerunLoop ] [ Movable _Pending _Connector:> | Movable _Pending ]
+  [ _LoopSection:ForwardPropagate ] [ moving Movable _Connector:> | Movable _Unprocessed ] -> [ _LoopSection:ForwardPropagate _RerunLoop ] [ moving Movable _Connector:> | moving Movable _Processing ]
+
+  [ _LoopSection:ForwardPropagate no _RerunLoop ] -> [ _LoopSection:ProcessMoving ]
+  [ _RerunLoop ] -> [ ]
+  
+  ( Process moving objects )
+  [ _LoopSection:ProcessMoving ] [ > Movable _Processing ] -> [ _LoopSection:ProcessMoving _RerunLoop ] [ > Movable _Processed ]
+  ( TODO: handle objects trying to move into the same space )
+  ( TODO: revert pending to processing or even processed if everything has moved out of the way )
+
+  [ _LoopSection:ProcessMoving ] -> [ _LoopSection:ProcessBlocked ]
+
+  ( Process blocked objects )
+
+  ( 1x1 objects become permanently blocked )
+  [ _LoopSection:ProcessBlocked ] [ RigidMovable _Processing _Blocked ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ RigidMovable _Processed _Blocked ]
+  ( As do 2x1 blocks moving along their short side )
+  [ _LoopSection:ProcessBlocked ] [ _Jelly2x1:perpendicular _Processing > _Blocked ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ _Jelly2x1:perpendicular _Processed _Blocked ]
+
+  ( TODO: 2x1 blocks moving along their long side try to squish towards both sides )
+  [ _LoopSection:ProcessBlocked ] [ _Jelly2x1:parallel _Processing > _Blocked _Connector:> | > _Blocked _Connector:> | > _Blocked _Connector:> | > _Blocked no _Connector:> ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ > _Jelly2x1:parallel _Processing _Connector:> | > _Jelly2x1:parallel _Connector:> | _Connector:> _Temp | _Temp ]
+  [ _LoopSection:ProcessBlocked ] [ _Jelly2x1:directions _Connector:^ _Temp ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ v _Jelly2x1:directions _Connector:^ ]
+
+  ( Blocked objects propagate this status backwards )
+  [ _LoopSection:ProcessBlocked ] [ > Movable no _Connector:> | Movable _Processed _Blocked ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ Movable _Processing > _Blocked | Movable _Processed _Blocked ]
+  [ _LoopSection:ProcessBlocked ] [ Movable _Processing _Connector:> | Movable _Pending ] -> [ _LoopSection:ProcessBlocked _RerunLoop ] [ Movable _Processing _Connector:> | Movable _Processing ]
+  
+  [ _LoopSection:ProcessBlocked _RerunLoop ] -> [ _LoopSection:ForwardPropagate ]
+  [ _LoopSection:ProcessBlocked ] -> [ ]
+endloop
+
+[ _Blocked ] -> [ ]
+[ _Unprocessed ] -> [ ]
+[ _Processed ] -> [ ]
+( TODO: this should be handled in the loop )
+[ _Pending ] -> [ ]
+
+[ moving Movable _Connector:directions ] -> [ moving Movable moving _Connector:directions ]
 
 (((( LATE RULES ))))
 
-(* Render sprites again *)
+( Render sprites again )
 late [ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
 late [ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
-late directions [ _Jelly2x1:directions _Connector:right _Connector:up ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
+late directions [ _Jelly2x1:directions _Connector:right _Connector:up no _Connector:left no _Connector:down ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
 
 ==============
 WINCONDITIONS
@@ -203,9 +289,9 @@ LEVELS
 #..............#
 #..............#
 #........│.....#
-#*.p...........#
+#*.p.#.........#
 #..............#
-#....*....─....#
+#....*...─.....#
 #..............#
 #..............#
 ################
