@@ -154,6 +154,9 @@ pink
 _Rerun
 pink
 
+_Vacated
+pink
+
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise. )
 _LS:LoopSection
 white
@@ -207,7 +210,7 @@ Sprite, Wall
 --
 
 _Player, _Jelly
-_Blocked, _Moving
+_Blocked, _Moving, _Vacated
 _Squishing
 MovementMarker
 _Temp
@@ -240,7 +243,7 @@ directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:ri
 [ _Jelly2x1:> _Connector:> _Connector:perpendicular no _Temp | | | ] -> [ _Jelly2x1:> _Connector:> _Connector:perpendicular | _Jelly2x1:> _Connector:> _Connector:perpendicular _Connector:< _Temp | _Jelly2x1:> _Connector:> _Connector:perpendicular _Connector:< _Temp | _Jelly2x1:> _Connector:< _Connector:perpendicular ]
 [ _Temp ] -> [ ]
 
-[ Movable ] -> [ Movable _Unprocessed ]
+[ Movable no Status ] -> [ Movable _Unprocessed ]
 
 ( Can't nest loops in PS, so we have to build our put everything in a single loop and group things manually )
 random [ ] -> [ _LS:FP ]
@@ -254,7 +257,7 @@ startloop
 
   ( Movables trying to move into other movables are marked as pending )
   [ _LS:FP ] [ Movable _Moving:> _Processing no _Connector:> | Movable ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> _Pending | Movable ]
-  [ _LS:FP ] [ Movable _Pending _Connector:> | Movable ] -> [ _LS:FP _Rerun ] [ Movable _Pending _Connector:> | Movable _Pending ]
+  [ _LS:FP ] [ Movable _Pending _Connector:> | Movable _Processing ] -> [ _LS:FP _Rerun ] [ Movable _Pending _Connector:> | Movable _Pending ]
     
   ( Propagate movement to unprocessed movables )
   [ _LS:FP ] [ Movable _Moving:> no _Connector:> | Movable _Unprocessed ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> | Movable _Moving:> _Processing ]
@@ -272,17 +275,18 @@ startloop
   [ _LS:PM ] [ Movable _Moving:> no _Connector:> | _MovementConflict ] -> [ _LS:PM _Rerun ] [ Movable _Processing _Blocked:> | _MovementConflict ]
   directions [ _LS:PM ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:PM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Blocked:directions ]
   [ MovementMarker ] -> [ ]
-  
-  ( If at this point a pending movable points at a processing movable, the latter is going to move out
-    of the way, so we revert the pending one to check it again next iteration )
-  [ _LS:PM ] [ Movable _Moving:> _Pending no _Connector:> | Movable no _Blocked _Processing ] -> [ _LS:PM _Rerun ] [ Movable _Moving:> _Processing | Movable _Processing ]
-  [ _LS:PM ] [ Movable _Processing _Connector:> | Movable ] -> [ _LS:PM _Rerun ] [ Movable _Processing _Connector:> | Movable _Processing ]
-  
+    
   ( Movables that are still marked as processing can move freely, so we perform the move and mark them as
     processed and blocked. To move all the things belonging to a movable, we move everything out of the moving
     cell into the empty cell, then move the movement marker and repeat. )
   [ _LS:PM ] [ Movable _Moving:> _Processing _Connector | no Movable ] -> [ _LS:PM _Rerun ] [ Movable _Moving:> _Processing | _Connector ]
-  + [ _LS:PM ] [ Movable _Moving:> _Processing | no Movable ] -> [ _LS:PM _Rerun ] [ | Movable _Blocked:> _Processed ]
+  + [ _LS:PM ] [ Movable _Moving:> _Processing | no Movable ] -> [ _LS:PM _Rerun ] [ _Vacated | Movable _Blocked:> _Processed ]
+  
+  ( If at this point a pending movable points at a vacated cell, we revert it to processing to check it again next
+    iteration )
+  [ _LS:PM ] [ Movable _Moving:> _Pending no _Connector:> | _Vacated ] -> [ _LS:PM _Rerun ] [ Movable _Moving:> _Processing | _Vacated ]
+  [ _LS:PM ] [ Movable _Processing _Connector:> | Movable _Pending ] -> [ _LS:PM _Rerun ] [ Movable _Processing _Connector:> | Movable _Processing ]
+  [ _Vacated ] -> [ ]
   
   [ _LS:PM ] -> [ _LS:PB ]
   
