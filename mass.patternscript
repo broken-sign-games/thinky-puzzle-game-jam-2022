@@ -63,6 +63,19 @@ Orange Yellow
 0000000000
 0000000000
 
+Jelly1x1TallSprite
+Brown
+0000000000
+0000000000
+00......00
+00......00
+00......00
+00......00
+00......00
+00......00
+0000000000
+0000000000
+
 Jelly2x1Sprite:left Jelly2x1Sprite:right
 Orange Yellow
 00000000000000000000
@@ -113,6 +126,9 @@ _Player
 transparent
 
 _Jelly1x1
+transparent
+
+_Jelly1x1Tall
 transparent
 
 _Jelly2x1:left _Jelly2x1:right
@@ -171,17 +187,18 @@ P = PlayerSprite
 * = Jelly1x1Sprite
 │ = Jelly2x1Sprite:up
 ─ = Jelly2x1Sprite:right
+! = Jelly1x1TallSprite
 
 
-Sprite = PlayerSprite or Jelly1x1Sprite or Jelly2x1Sprite:directions
+Sprite = PlayerSprite or Jelly1x1Sprite or Jelly2x1Sprite:directions or Jelly1x1TallSprite
 
 _Jelly2x1 = _Jelly2x1:directions
 
-_Jelly = _Jelly1x1 or _Jelly2x1
+_Jelly = _Jelly1x1 or _Jelly2x1 or _Jelly1x1Tall
 
 ObjectType = _Jelly or _Player
 
-RigidMovable = _Jelly1x1 or _Player
+RigidMovable = _Jelly1x1 or _Jelly1x1Tall or _Player
 
 Movable = _Jelly or _Player
 
@@ -237,6 +254,10 @@ RULES
 [ Jelly1x1Sprite ] -> [ _Jelly1x1 _Connector:right _Connector:up ]
 [ _Jelly1x1 _Connector:> _Connector:^ | ] -> [ _Jelly1x1 _Connector:> _Connector:^ | _Jelly1x1 _Connector:< _Connector:^ ]
 
+( Expand tall 1x1 jellies )
+[ Jelly1x1TallSprite ] -> [ _Jelly1x1Tall _Connector:right _Connector:up ]
+[ _Jelly1x1Tall _Connector:> _Connector:^ | ] -> [ _Jelly1x1Tall _Connector:> _Connector:^ | _Jelly1x1Tall _Connector:< _Connector:^ ]
+
 ( Expand 2x1 jellies )
 directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:right _Connector:up ]
 [ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | ] -> [ _Jelly2x1:perpendicular _Connector:> _Connector:perpendicular | _Jelly2x1:perpendicular _Connector:< _Connector:perpendicular ]
@@ -282,7 +303,6 @@ startloop
   [ _LS:RM ] [ Movable _Moving:> _Processing _Connector no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing | _Connector ]
   + [ _LS:RM ] [ Movable _Moving:> _Processing no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ _Vacated | Movable _Blocked:> _Processed ]
   
-  ((( TODO: Process squishing objects )))
   ( Squishing objects that are still marked as processing can squish freely. We handle the different squishing
     cases explicitly. )
   ( Squish 2x1 equally. We expand the front 1x1 into a 2x1 and then delete the rear 1x1. )
@@ -291,7 +311,12 @@ startloop
   [ _LS:RM ] [ | _Jelly2x1:perpendicular _Moving:< _Processing _Squishing _Connector:perpendicular | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:> | _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< ]
   [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | no _Squishing no _Connector:< ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | ]
   
+  ( TODO: Process one-sided squish )
   
+  ( Squish 2x1 into a tall 1x1 if both sides are blocked. )
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing | _Jelly2x1:perpendicular _Blocked:> _Processing _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing _Temp | _Jelly2x1:perpendicular _Blocked:> _Processing _Squishing _Temp ]
+  [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> no _Connector:< | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | _Jelly1x1Tall _Connector:> _Processed _Blocked:> | _Jelly1x1Tall _Connector:< _Processed _Blocked:> ]
+
   ( If at this point a pending movable points at a vacated cell, we revert it to processing to check it again next
     iteration )
   [ _LS:RM ] [ Movable _Moving:> _Pending no _Connector:> | _Vacated ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing | _Vacated ]
@@ -310,33 +335,31 @@ startloop
   [ _LS:RM ] [ _Jelly2x1:parallel _Processing _Blocked:> _Connector:> | _Blocked:> _Connector:> | _Blocked:> _Connector:> | _Blocked:> no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | _Jelly2x1:parallel _Moving:> _Squishing _Connector:> | _Squishing _Connector:> > _Temp | _Squishing > _Temp ]
   [ _LS:RM ] [ _Jelly2x1:directions _Connector:> perpendicular _Temp ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:directions _Moving:< _Connector:> ]
   
-  ( TODO: blocked while squishing )
+  ( TODO: blocked on one side while squishing )
 
   ( Blocked objects propagate this status backwards )
   [ _LS:RM ] [ Movable _Moving:> no _Connector:> | Movable _Processed _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Blocked:> | Movable _Processed _Blocked ]
   directions [ _LS:RM ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Blocked:directions ]
   [ _LS:RM ] [ Movable _Processing _Connector:> | Movable _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Connector:> | Movable _Processing ]
   
+  ( If pending objects survive a whole iteration without any changes, mark them as blocked )
+  ( TODO: We probably need to determine cycles here and only block those D: )
+  [ _LS:RM no _Rerun ] [ _Pending ]  -> [ _LS:RM ] [ _Pending _Temp ]
+  [ _LS:RM ] [ _Pending _Moving:> _Temp ] -> [ _LS:RM _Rerun ] [ _Processing _Blocked:> ]
+  
   [ _LS:RM _Rerun ] -> [ _LS:FP ]
   [ _LS:RM ] -> [ ]
-  
-  ( TODO: if pending objects survive a whole iteration without any changes, mark them as blocked )
 endloop
 
 [ _Blocked ] -> [ ]
 [ _Unprocessed ] -> [ ]
 [ _Processed ] -> [ ]
-( TODO: this should be handled in the loop )
-[ _Pending ] -> [ ]
-
-[ moving Movable _Connector:directions ] -> [ moving Movable moving _Connector:directions ]
-
-(((( LATE RULES ))))
 
 ( Render sprites again )
-late [ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
-late [ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
-late directions [ _Jelly2x1:directions _Connector:right _Connector:up no _Connector:left no _Connector:down ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
+[ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
+[ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
+[ _Jelly1x1Tall _Connector:right _Connector:up ] -> [ Jelly1x1TallSprite _Connector:right _Connector:up ]
+directions [ _Jelly2x1:directions _Connector:right _Connector:up no _Connector:left no _Connector:down ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
 
 ==============
 WINCONDITIONS
@@ -352,10 +375,10 @@ LEVELS
 #..............#
 #..............#
 #..............#
-#........│.....#
-#*.p.#.........#
+#....│.........#
+#*.p.#...─.....#
 #..............#
-#....*...─.....#
+#....*...─....##
 #..............#
 #..............#
 ################
