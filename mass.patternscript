@@ -14,8 +14,8 @@ R_ = right
 D_ = down
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
-ForwardPropagage ResolveMovement )
-LoopSection = FP RM
+ForwardPropagage ResolveMovement DetectCycles BlockCycles )
+LoopSection = FP RM DC BC
 
 directions1 = directions
 
@@ -161,6 +161,15 @@ green
 _Pending
 purple
 
+_PendingChecking
+black
+
+_PendingNoCycle
+grey
+
+_PendingCycle
+white
+
 _Processed
 blue
 
@@ -216,7 +225,8 @@ _BlockedExcept:left = _Blocked:right and _Blocked:up and _Blocked:down
 _BlockedExcept:right = _Blocked:left and _Blocked:up and _Blocked:down
 _BlockedExcept:up = _Blocked:left and _Blocked:right and _Blocked:down
 _BlockedExcept:down = _Blocked:left and _Blocked:right and _Blocked:up
-Status = _Unprocessed or _Processing or _Pending or _Processed
+Status = _Unprocessed or _Processing or _Pending or _PendingChecking or _Processed
+_PendingChecked = _PendingCycle or _PendingNoCycle
 
 MovementMarker = _MovementTarget or _MovementConflict
 
@@ -245,6 +255,7 @@ MovementMarker
 _Temp
 _Rerun
 Status
+_PendingChecked
 _LS:LoopSection
 directions -> _Connector:directions
 
@@ -279,7 +290,8 @@ directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:ri
 [ Movable no Status ] -> [ Movable _Unprocessed ]
 
 ( Can't nest loops in PS, so we have to put everything in a single loop and group things manually )
-random [ ] -> [ _LS:FP ]
+random [ ] -> [ _Temp ]
+[ ] [ _Temp ] -> [ _LS:FP ] [ ]
 
 startloop
   ((( Forward propagate movement intent )))
@@ -297,17 +309,17 @@ startloop
   [ _LS:FP ] [ Movable _Moving _Connector:> | Movable no _Moving ] -> [ _LS:FP _Rerun ] [ Movable _Moving _Connector:> | Movable _Moving _Processing no _Blocked ]
 
   [ _LS:FP no _Rerun ] -> [ _LS:RM ]
-  [ _Rerun ] -> [ ]
+  [ _LS:FP _Rerun ] -> [ _LS:FP ]
   
   ((( Resolve movement and squishing )))
   
   ( Find cells moved into by multiple objects and block those objects )
   [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> _Processing no _Connector:> no _Temp | no _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementTarget ]
   [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> _Processing no _Connector:> no _Temp | _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementConflict ]
-  [ _Temp ] -> [ ]
+  [ _LS:RM _Rerun ] [ _Temp ] -> [ _LS:RM _Rerun ] [ ]
   [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> no _Connector:> | _MovementConflict ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Blocked:> _Processing | _MovementConflict ]
   directions [ _LS:RM _Rerun ] [ Movable _Moving:directions _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions _Blocked:directions ]
-  [ MovementMarker ] -> [ ]
+  [ _LS:RM _Rerun ] [ MovementMarker ] -> [ _LS:RM _Rerun ] [ ]
     
   ( Movables that are still marked as processing can move freely, so we perform the move and mark them as
     processed and blocked. To move all the things belonging to a movable, we move everything out of the moving
@@ -341,7 +353,7 @@ startloop
     iteration )
   [ _LS:RM ] [ Movable _Moving:> _Pending no _Connector:> | _Vacated ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing | _Vacated ]
   directions [ _LS:RM ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Processing ]
-  [ _Vacated ] -> [ ]
+  [ _LS:RM ] [ _Vacated ] -> [ _LS:RM ] [ ]
     
   
   ((( Process blocked objects )))
@@ -364,13 +376,39 @@ startloop
   directions [ _LS:RM ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions no _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions _FullyBlocked ]
   directions [ _LS:RM ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Processing ]
   
-  ( If pending objects survive a whole iteration without any changes, mark them as blocked )
-  ( TODO: We probably need to determine cycles here and only block those D: )
-  [ _LS:RM no _Rerun ] [ _Pending ]  -> [ _LS:RM ] [ _Pending _Temp ]
-  [ _LS:RM ] [ _Pending _Moving:> _Temp ] -> [ _LS:RM _Rerun ] [ _Processing _Moving:> _Blocked:> ]
-  
   [ _LS:RM _Rerun ] -> [ _LS:FP ]
-  [ _LS:RM ] -> [ ]
+  
+  ((( Detect cycles of pending objects and block them )))
+  [ _LS:RM no _Rerun ] [ _Pending ] -> [ _LS:DC _Temp ] [ _Pending ]
+    
+  ( Pick a pending object to process )
+  [ _LS:DC _Temp ] [ _Pending no _PendingChecked _Moving:> no _Connector:> | _Pending ]  -> [ _LS:DC _Rerun ] [ _Pending _Moving:> _Temp | _PendingChecking ]
+  
+  ( Spread the PendingChecking status to all objects the marked one indirectly depends on )
+  directions [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _Pending ] -> [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _PendingChecking ]
+  + [ _LS:DC ] [ _PendingChecking _Moving:> no _Connector:> | _Pending ] -> [ _LS:DC ] [ _PendingChecking _Moving:> | _PendingChecking ]
+  
+  ( If the marked object was itself marked as PendingChecking, it's part of a cycle )
+  [ _LS:DC ] [ _Temp _PendingChecking  ] -> [ _LS:DC ] [ _Temp _PendingChecking _PendingCycle ]
+  [ _LS:DC ] [ _Temp _Pending ] -> [ _LS:DC ] [ _Temp _Pending _PendingNoCycle ]
+  
+  ( Spread the PendingChecked status to the entire object )
+  directions [ _LS:DC ] [ _PendingChecked _Moving:directions _Connector:> | _Moving:directions no _PendingChecked ] -> [ _LS:DC ] [ _PendingChecked _Moving:directions _Connector:> | _Moving:directions _PendingChecked ]
+  
+  ( Clean up PendingChecking status and move the temp marker back to the top left corner )
+  [ _LS:DC ] [ _PendingChecking ] -> [ _LS:DC ] [ _Pending ]
+  [ _LS:DC ] [ _Temp no _LS:DC ] -> [ _LS:DC _Temp ] [ ]
+  
+  ( Once we stop finding pending objects to check, we move on to resolving the cycles we found. )
+  [ _LS:DC _Temp no _Rerun ] -> [ _LS:BC ]
+  [ _LS:DC _Rerun ] -> [ _LS:DC ]
+    
+  [ _LS:BC ] [ _Pending _PendingCycle ] -> [ _LS:BC ] [ _Processing _FullyBlocked ]
+  [ _LS:BC ] [ _PendingNoCycle ] -> [ _LS:BC ] [ ]
+  
+  [ _LS:BC ] -> [ _LS:FP ]
+  
+  [ _LS:RM no _Rerun] -> [ ]
 endloop
 
 [ _Blocked ] -> [ ]
