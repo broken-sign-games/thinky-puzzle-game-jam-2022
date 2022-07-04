@@ -188,6 +188,9 @@ pink
 _Rerun
 pink
 
+_RerunDC
+pink
+
 _Vacated
 pink
 
@@ -257,7 +260,7 @@ _Squishing
 _CheckMovement
 MovementMarker
 _Temp
-_Rerun
+_Rerun, _RerunDC
 Status
 _PendingChecked
 _LS:LoopSection
@@ -381,13 +384,14 @@ startloop
   directions [ _LS:RM ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions no _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions _FullyBlocked ]
   directions [ _LS:RM ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Processing ]
   
+  [ _LS:RM no _Rerun ] -> [ _LS:DC ]
   [ _LS:RM _Rerun ] -> [ _LS:FP ]
   
   ((( Detect cycles of pending objects and block them )))
-  [ _LS:RM no _Rerun ] [ _Pending ] -> [ _LS:DC _Temp ] [ _Pending ]
+  [ _LS:DC ] [ _Pending ] -> [ _LS:DC _Temp ] [ _Pending ]
     
   ( Pick a pending object to process )
-  [ _LS:DC _Temp ] [ _Pending no _PendingChecked _Moving:> no _Connector:> | _Pending ]  -> [ _LS:DC _Rerun ] [ _Pending _Moving:> _Temp | _PendingChecking ]
+  [ _LS:DC _Temp ] [ _Pending no _PendingChecked _Moving:> no _Connector:> | _Pending ]  -> [ _LS:DC _RerunDC ] [ _Pending _Moving:> _Temp | _PendingChecking ]
   
   ( Spread the PendingChecking status to all objects the marked one indirectly depends on )
   directions [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _Pending ] -> [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _PendingChecking ]
@@ -405,15 +409,14 @@ startloop
   [ _LS:DC ] [ _Temp no _LS:DC ] -> [ _LS:DC _Temp ] [ ]
   
   ( Once we stop finding pending objects to check, we move on to resolving the cycles we found. )
-  [ _LS:DC _Temp no _Rerun ] -> [ _LS:BC ]
-  [ _LS:DC _Rerun ] -> [ _LS:DC ]
+  [ _LS:DC _Temp no _RerunDC ] -> [ _LS:BC ]
+  [ _LS:DC _RerunDC ] -> [ _LS:DC ]
     
-  [ _LS:BC ] [ _Pending _PendingCycle ] -> [ _LS:BC ] [ _Processing _FullyBlocked ]
+  [ _LS:BC ] [ _Pending _PendingCycle ] -> [ _LS:BC _Rerun ] [ _Processing _FullyBlocked ]
   [ _LS:BC ] [ _PendingNoCycle ] -> [ _LS:BC ] [ ]
   
-  [ _LS:BC ] -> [ _LS:FP ]
-  
-  [ _LS:RM no _Rerun] -> [ ]
+  [ _LS:BC no _Rerun] -> [ ]
+  [ _LS:BC _Rerun ] -> [ _LS:FP ]
 endloop
 
 [ _Blocked ] -> [ ]
