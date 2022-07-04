@@ -14,8 +14,8 @@ R_ = right
 D_ = down
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
-ForwardPropagage ResolveMovement DetectCycles BlockCycles )
-LoopSection = FP RM DC BC
+ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
+LoopSection = FP RM DC BC CS
 
 directions1 = directions
 
@@ -191,6 +191,9 @@ pink
 _RerunDC
 pink
 
+_RunSecondStep
+pink
+
 _Vacated
 pink
 
@@ -260,7 +263,9 @@ _Squishing
 _CheckMovement
 MovementMarker
 _Temp
-_Rerun, _RerunDC
+_Rerun
+_RerunDC
+_RunSecondStep
 Status
 _PendingChecked
 _LS:LoopSection
@@ -299,6 +304,7 @@ directions [ Jelly2x1Sprite:directions ] -> [ _Jelly2x1:directions _Connector:ri
 ( Can't nest loops in PS, so we have to put everything in a single loop and group things manually )
 random [ ] -> [ _Temp ]
 [ ] [ _Temp ] -> [ _LS:FP ] [ ]
+[ _LS:FP ] [ _Player _Moving:> ] -> [ _LS:FP > _RunSecondStep ] [ _Player _Moving:> ]
 
 startloop
   ((( Forward propagate movement intent )))
@@ -366,6 +372,8 @@ startloop
   
   ((( Process blocked objects )))
 
+  ( If the player is blocked, we cancel the second step, if any )
+  [ _LS:RM _RunSecondStep ] [ _Player _Processing _Moving:> _Blocked:> ] -> [ _LS:RM ] [ _Player _Processing _Moving:> _Blocked:> ]
   ( 1x1 objects become permanently blocked )
   [ _LS:RM ] [ RigidMovable _Processing _Moving:> _Blocked:> ] -> [ _LS:RM _Rerun ] [ RigidMovable _Processed _Blocked:> ]
   ( As do 2x1 blocks moving along their short side )
@@ -409,21 +417,28 @@ startloop
   [ _LS:DC ] [ _Temp no _LS:DC ] -> [ _LS:DC _Temp ] [ ]
   
   ( Once we stop finding pending objects to check, we move on to resolving the cycles we found. )
-  [ _LS:DC _Temp no _RerunDC ] -> [ _LS:BC ]
+  [ _LS:DC _Temp ] -> [ _LS:DC ]
+  [ _LS:DC no _RerunDC ] -> [ _LS:BC ]
   [ _LS:DC _RerunDC ] -> [ _LS:DC ]
     
   [ _LS:BC ] [ _Pending _PendingCycle ] -> [ _LS:BC _Rerun ] [ _Processing _FullyBlocked ]
   [ _LS:BC ] [ _PendingNoCycle ] -> [ _LS:BC ] [ ]
   
-  [ _LS:BC no _Rerun] -> [ ]
+  [ _LS:BC no _Rerun] -> [ _LS:CS ]
   [ _LS:BC _Rerun ] -> [ _LS:FP ]
+
+  ((( CLeanup and check if we should run another step )))
+  
+  [ _LS:CS ] [ _Blocked ] -> [ _LS:CS ] [ ]
+  [ _LS:CS ] [ _Unprocessed ] -> [ _LS:CS ] [ ]
+  [ _LS:CS ] [ _Processed ] -> [ _LS:CS ] [ ]
+  
+  [ _LS:CS no _RunSecondStep ] -> [ ]
+  
+  [ _LS:CS > _RunSecondStep ] [ _Player no _Moving ] -> [ _LS:CS > _RunSecondStep ] [ _Player _Moving:> _Processing ]
+  [ _LS:CS _RunSecondStep ] -> [ _LS:FP ]
 endloop
 
-[ _Blocked ] -> [ ]
-[ _Unprocessed ] -> [ ]
-[ _Processed ] -> [ ]
-
-( TODO: Run two steps at once unless player is blocked )
 
 ( Render sprites again )
 [ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
