@@ -17,6 +17,8 @@ D_ = down
 ForwardPropagage ResolveMovement )
 LoopSection = FP RM
 
+directions1 = directions
+
 ========
 OBJECTS
 ========
@@ -179,7 +181,7 @@ pink
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise. )
 _LS:LoopSection
-white
+transparent
 
 =======
 LEGEND
@@ -209,6 +211,11 @@ Movable = _Jelly or _Player
 _Connector = _Connector:directions
 _Moving = _Moving:directions
 _Blocked = _Blocked:directions
+_FullyBlocked = _Blocked:left and _Blocked:right and _Blocked:up and _Blocked:down
+_BlockedExcept:left = _Blocked:right and _Blocked:up and _Blocked:down
+_BlockedExcept:right = _Blocked:left and _Blocked:up and _Blocked:down
+_BlockedExcept:up = _Blocked:left and _Blocked:right and _Blocked:down
+_BlockedExcept:down = _Blocked:left and _Blocked:right and _Blocked:up
 Status = _Unprocessed or _Processing or _Pending or _Processed
 
 MovementMarker = _MovementTarget or _MovementConflict
@@ -231,14 +238,15 @@ Sprite, Wall
 --
 
 _Player, _Jelly
-_Blocked, _Moving, _Vacated
+directions -> _Blocked:directions
+_Moving, _Vacated
 _Squishing
 MovementMarker
 _Temp
 _Rerun
-directions -> _Connector:directions
 Status
 _LS:LoopSection
+directions -> _Connector:directions
 
 ======
 RULES
@@ -277,58 +285,57 @@ startloop
   ((( Forward propagate movement intent )))
   
   ( Walls immediately block movement )
-  [ _LS:FP ] [ Movable _Moving:> | Wall ] -> [ _LS:FP _Rerun ] [ Movable _Blocked:> | Wall ]
-  directions [ _LS:FP ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:FP _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Blocked:directions ]
-
+  [ _LS:FP ] [ Movable _Moving:> no _Blocked:> | Wall ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> _FullyBlocked | Wall ]
+  directions [ _LS:FP ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions no _Blocked ] -> [ _LS:FP _Rerun ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions _FullyBlocked ]
+ 
   ( Movables trying to move into other movables are marked as pending )
-  [ _LS:FP ] [ Movable _Moving:> _Processing no _Connector:> | Movable ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> _Pending | Movable ]
+  [ _LS:FP ] [ Movable _Moving:> no _Blocked:> _Processing no _Connector:> | Movable ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> _Pending | Movable ]
   directions [ _LS:FP ] [ Movable _Moving:directions _Pending _Connector:> | Movable _Moving:directions _Processing ] -> [ _LS:FP _Rerun ] [ Movable _Moving:directions _Pending _Connector:> | Movable _Moving:directions _Pending ]
     
   ( Propagate movement to unprocessed movables )
-  [ _LS:FP ] [ Movable _Moving:> no _Connector:> | Movable _Unprocessed ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> | Movable _Moving:> _Processing ]
-  [ _LS:FP ] [ Movable _Moving _Connector:> | Movable _Unprocessed ] -> [ _LS:FP _Rerun ] [ Movable _Moving _Connector:> | Movable _Moving _Processing ]
+  [ _LS:FP ] [ Movable _Moving:> no _Blocked:> no _Connector:> | Movable no _Moving no _Blocked:> ] -> [ _LS:FP _Rerun ] [ Movable _Moving:> | Movable _Moving:> _Processing no _Blocked ]
+  [ _LS:FP ] [ Movable _Moving _Connector:> | Movable no _Moving ] -> [ _LS:FP _Rerun ] [ Movable _Moving _Connector:> | Movable _Moving _Processing no _Blocked ]
 
   [ _LS:FP no _Rerun ] -> [ _LS:RM ]
   [ _Rerun ] -> [ ]
   
   ((( Resolve movement and squishing )))
   
-  ( TODO If things move a single cell, we should allow them to be moved another, since side-squishing jellies
-    can expand two cells in a single step. )
-  
   ( Find cells moved into by multiple objects and block those objects )
-  [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing no _Connector:> no _Temp | no _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementTarget ]
-  [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing no _Connector:> no _Temp | _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementConflict ]
+  [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> _Processing no _Connector:> no _Temp | no _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementTarget ]
+  [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> _Processing no _Connector:> no _Temp | _MovementTarget ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing _Temp | _MovementConflict ]
   [ _Temp ] -> [ ]
-  [ _LS:RM _Rerun ] [ Movable _Moving:> no _Connector:> | _MovementConflict ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Blocked:> | _MovementConflict ]
-  directions [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Blocked:directions ]
+  [ _LS:RM _Rerun ] [ Movable _Moving:> no _Blocked:> no _Connector:> | _MovementConflict ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Blocked:> _Processing | _MovementConflict ]
+  directions [ _LS:RM _Rerun ] [ Movable _Moving:directions _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions _Blocked:directions ]
   [ MovementMarker ] -> [ ]
     
   ( Movables that are still marked as processing can move freely, so we perform the move and mark them as
     processed and blocked. To move all the things belonging to a movable, we move everything out of the moving
     cell into the empty cell, then move the movement marker and repeat. )
-  [ _LS:RM ] [ Movable _Moving:> _Processing _Connector no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing | _Connector ]
-  + [ _LS:RM ] [ Movable _Moving:> _Processing no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ _Vacated | Movable _Blocked:> _Processed ]
+  [ _LS:RM ] [ Movable _Moving:> no _Blocked:> _Processing _Connector no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ Movable _Moving:> _Processing | _Connector ]
+  + [ _LS:RM ] [ Movable _Moving:> no _Blocked:> _Processing no _Squishing | no Movable ] -> [ _LS:RM _Rerun ] [ _Vacated | Movable _BlockedExcept:> _Processed no _Vacated ]
   
   ( Squishing objects that are still marked as processing can squish freely. We handle the different squishing
     cases explicitly. )
   ( Squish 2x1 equally. We expand the front 1x1 into a 2x1 and then delete the rear 1x1. )
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< _Processing _Squishing | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Moving:< _Processing _Squishing _Temp | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Temp ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< no _Blocked:< _Processing _Squishing | _Jelly2x1:perpendicular _Moving:> no _Blocked:> _Processing _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Moving:< _Processing _Squishing _Temp | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Temp ]
   [ _LS:RM ] [ _Connector:> no _Connector:< _Temp | _Connector:< _Connector:> _Temp ] -> [ _LS:RM _Rerun ] [ _Connector:> | _Connector:< ]
-  [ _LS:RM ] [ | _Jelly2x1:perpendicular _Moving:< _Processing _Squishing _Connector:perpendicular | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:> | _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< ]
+  [ _LS:RM ] [ | _Jelly2x1:perpendicular _Moving:< no _Blocked:< _Processing _Squishing _Connector:perpendicular | _Jelly2x1:perpendicular _Moving:> no _Blocked:> _Processing _Squishing | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< ]
   [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | no _Squishing no _Connector:< ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | ]
 
   ( Squish 2x1 to one side. We expand the front 1x1 into a 2x1 and then delete the rear 1x1. )
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing no _Connector:< _Connector:> | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Connector:< _Connector:> | _TempJelly _Moving:> _Processing _Squishing _Connector:< no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing _Connector:> _Temp | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Connector:< _Connector:> _Temp | _TempJelly _Moving:> _Processing _Squishing _Connector:< ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing no _Connector:< _Connector:> | _Jelly2x1:perpendicular _Moving:> no _Blocked:> _Processing _Squishing _Connector:< _Connector:> | _TempJelly _Moving:> no _Blocked:> _Processing _Squishing _Connector:< no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing _Connector:> _Temp | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Connector:< _Connector:> _Temp | _TempJelly _Moving:> _Processing _Squishing _Connector:< ]
   [ _LS:RM ] [ _Jelly2x1:parallel _Connector:> no _Connector:< _Temp | _Connector:< _Connector:> _Temp ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel _Connector:> | _Connector:< ]
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing _Connector:perpendicular | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing | _TempJelly _Moving:> _Processing _Squishing _Connector:< no _Connector:> | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:> | _Jelly2x1:> _Blocked:< _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _Blocked:> _Processed _Connector:perpendicular _Connector:< ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing _Connector:perpendicular | _Jelly2x1:perpendicular _Moving:> no _Blocked:> _Processing _Squishing | _TempJelly _Moving:> no _Blocked:> _Processing _Squishing _Connector:< no _Connector:> | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< _Connector:> | _Jelly2x1:> _FullyBlocked _Processed _Connector:perpendicular _Connector:< ]
   [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | no _Squishing no _Connector:< ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | ]
   
-  ( TODO: Process one-sided squish )
+  ( When a 2x1 gets blocked halfway through squishing to one side, we remove the temporary jelly
+    objects and treat this the same as if it had been blocked immediately. )
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing no _Connector:< _Connector:> | _Jelly2x1:perpendicular _Moving:> _Processing _Squishing _Connector:< _Connector:> | _TempJelly _Moving:> _Blocked:> _Processing _Squishing _Connector:< ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing _Connector:> | _Jelly2x1:perpendicular _Moving:> _Blocked:> _Processing _Squishing _Connector:< | no _Blocked ]
   
   ( Squish 2x1 into a tall 1x1 if both sides are blocked. )
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing | _Jelly2x1:perpendicular _Blocked:> _Processing _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Blocked:< _Processing _Squishing _Temp | _Jelly2x1:perpendicular _Blocked:> _Processing _Squishing _Temp ]
-  [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> no _Connector:< | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | _Jelly1x1Tall _Connector:> _Processed _Blocked:> | _Jelly1x1Tall _Connector:< _Processed _Blocked:> ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing | _Jelly2x1:perpendicular _Moving:> _Blocked:> _Processing _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Moving:< _Blocked:< _Processing _Squishing _Temp | _Jelly2x1:perpendicular _Moving:> _Blocked:> _Processing _Squishing _Temp ]
+  [ _LS:RM ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> no _Connector:< | _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< _Connector:> | _Jelly2x1:parallel _Temp _Processing _Squishing _Connector:< no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Vacated no _Connector | _Vacated no _Connector | _Jelly1x1Tall no _Moving _Connector:> _Processed _FullyBlocked | _Jelly1x1Tall no _Moving _Connector:< _Processed _FullyBlocked ]
 
   ( If at this point a pending movable points at a vacated cell, we revert it to processing to check it again next
     iteration )
@@ -340,29 +347,27 @@ startloop
   ((( Process blocked objects )))
 
   ( 1x1 objects become permanently blocked )
-  [ _LS:RM ] [ RigidMovable _Processing _Blocked ] -> [ _LS:RM _Rerun ] [ RigidMovable _Processed _Blocked ]
+  [ _LS:RM ] [ RigidMovable _Processing _Moving:> _Blocked:> ] -> [ _LS:RM _Rerun ] [ RigidMovable _Processed _Blocked:> ]
   ( As do 2x1 blocks moving along their short side )
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Processing _Blocked:> no _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Processed _Blocked:> ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Processing _Moving:> _Blocked:> no _Squishing ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Processed _Blocked:> ]
 
   ( 2x1 blocks moving along their long side try to squish towards both sides )
-  [ _LS:RM ] [ _Jelly2x1:parallel _Processing _Blocked:> _Connector:> | _Blocked:> _Connector:> | _Blocked:> _Connector:> | _Blocked:> no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel _Moving:> _Processing _Squishing _Connector:> | _Jelly2x1:parallel _Moving:> _Squishing _Connector:> | _Squishing _Connector:> > _Temp | _Squishing > _Temp ]
-  [ _LS:RM ] [ _Jelly2x1:directions _Connector:> perpendicular _Temp ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:directions _Moving:< _Connector:> ]
+  [ _LS:RM ] [ _Jelly2x1:parallel _Processing _Moving:> _Blocked:> _Connector:> | _Moving:> _Blocked:> _Connector:> | _Moving:> _Blocked:> _Connector:> | _Moving:> _Blocked:> no _Connector:> ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel _Moving:> no _Blocked _Processing _Squishing _Connector:> | _Moving:> no _Blocked _Squishing _Connector:> | _Squishing _Connector:> > _Temp | _Squishing > _Temp ]
+  [ _LS:RM ] [ _Jelly2x1:directions _Connector:> perpendicular _Temp ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:directions _Moving:< no _Blocked _Connector:> ]
   
   ( 2x1 blocks trying to squish but being blocked on one side try to expand two cells to the other side.
     We mark this with some temporary jelly objects )
-  [ _LS:RM ] [ _Jelly2x1:perpendicular _Processing _Blocked:< _Squishing _Connector:> | _Jelly2x1:perpendicular _Processing _Moving:> _Squishing | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Processing _Blocked:< _Squishing _Connector:> | _Jelly2x1:perpendicular _Processing _Moving:> _Squishing _Connector:> | _TempJelly _Processing _Moving:> _Squishing _Connector:< ]
+  [ _LS:RM ] [ _Jelly2x1:perpendicular _Processing _Blocked:< _Moving:< _Squishing _Connector:> | _Jelly2x1:perpendicular _Processing _Moving:> no _Blocked:> _Squishing | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular _Processing _Blocked:< _Moving:< _Squishing _Connector:> | _Jelly2x1:perpendicular _Processing _Moving:> _Squishing _Connector:> | _TempJelly _Processing _Moving:> _Squishing _Connector:< ]
   
-  ( TODO: blocked two cells away during one-sided squish )
-
   ( Blocked objects propagate this status backwards )
-  [ _LS:RM ] [ Movable _Moving:> no _Connector:> | Movable _Processed _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Blocked:> | Movable _Processed _Blocked ]
-  directions [ _LS:RM ] [ Movable _Blocked:directions _Connector:> | Movable _Moving:directions ] -> [ _LS:RM _Rerun ] [ Movable _Blocked:directions _Connector:> | Movable _Blocked:directions ]
+  [ _LS:RM ] [ Movable _Moving:> no _Blocked:> no _Connector:> | Movable _Processed _Blocked:> ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Moving:> _FullyBlocked | Movable _Processed _Blocked:> ]
+  directions [ _LS:RM ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions no _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions _FullyBlocked ]
   directions [ _LS:RM ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Processing ]
   
   ( If pending objects survive a whole iteration without any changes, mark them as blocked )
   ( TODO: We probably need to determine cycles here and only block those D: )
   [ _LS:RM no _Rerun ] [ _Pending ]  -> [ _LS:RM ] [ _Pending _Temp ]
-  [ _LS:RM ] [ _Pending _Moving:> _Temp ] -> [ _LS:RM _Rerun ] [ _Processing _Blocked:> ]
+  [ _LS:RM ] [ _Pending _Moving:> _Temp ] -> [ _LS:RM _Rerun ] [ _Processing _Moving:> _Blocked:> ]
   
   [ _LS:RM _Rerun ] -> [ _LS:FP ]
   [ _LS:RM ] -> [ ]
@@ -371,6 +376,8 @@ endloop
 [ _Blocked ] -> [ ]
 [ _Unprocessed ] -> [ ]
 [ _Processed ] -> [ ]
+
+( TODO: Run two steps at once unless player is blocked )
 
 ( Render sprites again )
 [ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
