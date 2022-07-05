@@ -2,6 +2,9 @@ title Isaac and the Conservation of Mass
 author Menderbug
 homepage menderbug.itch.io
 
+background_color #313638
+text_color #4d9be6
+
 game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
 run_rules_on_level_start
@@ -20,12 +23,25 @@ Subtile = _BL _BR _TL _TR
 ( There are only actual floor levels at 0 and 1, but tall jellies or stacked objects could be
   on level higher )
 Floor = _0 _1 _2
+LowFloor = _0 _1
+HighFloor = _1 _2
+
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
 ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
 LoopSection = FP RM DC BC CS
 
 directions1 = directions
+
+=========
+MAPPINGS
+=========
+
+LowFloor => Higher
+_0 _1 -> _1 _2
+
+HighFloor => Lower
+_1 _2 -> _0 _1
 
 ========
 OBJECTS
@@ -34,27 +50,22 @@ OBJECTS
 Background
 #1a1518
 
-Floor:_0:_BL
-#484a77 #4d65b4 
-00001
+Floor:_0 
+#484a77
+
+Floor:_1
+#484a77 #323353 
 00000
 00000
 00000
 00000
+00000
+11111
+11111
+11111
+11111
 
-Floor:_0:_BR
-#484a77 #4d65b4 
-copy: Floor:_0:_BL rot:>:^
-
-Floor:_0:_TL
-#484a77 #4d65b4 
-copy: Floor:_0:_BL rot:>:v
-
-Floor:_0:_TR
-#484a77 #4d65b4 
-copy: Floor:_0:_BL rot:>:<
-
-Wall
+Wall Floor:_2
 #313638 #323353 
 00000
 00000
@@ -69,6 +80,52 @@ Wall
 11111
 11111
 11111
+
+FloorDeco:_0:_BL
+#4d65b4 
+....0
+.....
+.....
+.....
+.....
+
+FloorDeco:_0:_BR
+#4d65b4 
+copy: FloorDeco:_0:_BL rot:>:^
+
+FloorDeco:_0:_TL
+#4d65b4 
+copy: FloorDeco:_0:_BL rot:>:v
+
+FloorDeco:_0:_TR
+#4d65b4 
+copy: FloorDeco:_0:_BL rot:>:<
+
+FloorDeco:_1:Subtile
+#4d9be6
+copy: FloorDeco:_0:Subtile translate:up:4
+
+FloorDeco:_2:Subtile
+transparent
+
+FloorEdge:directions
+#4d9be6
+.....
+.....
+.....
+00000
+00000
+rot:down:> translate:up:4
+
+( Fixup for outer corners of higher floors. Direction corresponds to the clockwise edge leg. )
+FloorCorner:directions
+#4d9be6
+.....
+.....
+.....
+00...
+00...
+rot:left:> translate:up:4
 
 ( Hides the front-facing walls in the bottom two rows of the grid )
 WallCover
@@ -146,7 +203,7 @@ WallEdge:directions
 00000
 rot:down:> translate:up:8
 
-( Fix up for outer corners of walls. Direction corresponds to the clockwise wall leg. )
+( Fixup for outer corners of walls. Direction corresponds to the clockwise wall leg. )
 WallCorner:directions
 #0b8a8f #374e4a
 .....
@@ -263,13 +320,14 @@ Jelly2x1Sprite:up Jelly2x1Sprite:down
 2222221122
 
 _Connector:directions
-pink
+transparent
+(pink
 .....
 .....
 ..000
 .....
 .....
-rot:right:>
+rot:right:>)
 
 _Player:Floor
 transparent
@@ -355,14 +413,15 @@ transparent
 LEGEND
 =======
 
-. = Background
+. = Floor:_0
+* = Floor:_1
 # = Wall
-P = PlayerSprite:_0
-ℙ = PlayerSprite:_1
-* = Jelly1x1Sprite
-│ = Jelly2x1Sprite:up
-─ = Jelly2x1Sprite:right
-! = Jelly1x1TallSprite
+P = PlayerSprite:_0 and Floor:_0
+ℙ = PlayerSprite:_1 and Floor:_1
+@ = Jelly1x1Sprite and Floor:_0
+│ = Jelly2x1Sprite:up and Floor:_0
+─ = Jelly2x1Sprite:right and Floor:_0
+! = Jelly1x1TallSprite and Floor:_0
 
 
 Sprite = PlayerSprite:Floor or Jelly1x1Sprite or Jelly2x1Sprite:directions or Jelly1x1TallSprite
@@ -409,10 +468,13 @@ COLLISIONLAYERS
 --<v--
 
 Background
-Floor:_0:Subtile
-Sprite, Wall
+Floor:Floor
+FloorDeco:Floor:Subtile
+directions -> FloorEdge:directions
+directions -> FloorCorner:directions
 WallCover
 directions -> WallEdgeDark:directions:Subtile
+Sprite
 
 --<v--
 
@@ -452,11 +514,15 @@ down [ _Subtile:_TR | ] -> [ _Subtile:_TR | _Subtile:_BR ]
 down [ _Subtile:_BR | | ] -> [ _Subtile:_BR | _Subtile:_TR | _Subtile:_BR ]
 
 ( Fill empty cells with lower floor tiles )
-Subtile [ no Wall _Subtile:Subtile ] -> [ _Subtile:Subtile Floor:_0:Subtile ]
+Floor Subtile [ Floor:Floor _Subtile:Subtile ] -> [ Floor:Floor _Subtile:Subtile FloorDeco:Floor:Subtile ]
 
 ( Cover the bottom two rows with special wall tiles )
 down [ | ] -> [ > Background | ]
 [ stationary Background ] -> [ WallCover ]
+
+( Decorate the edges of higher floors )
+[ Floor:_1 | no Floor:_1 no Wall ] -> [ Floor:_1 FloorEdge:> | ]
+[ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
 
 ( Decorate the edges of walls )
 Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
@@ -646,14 +712,14 @@ LEVELS
 ##################
 ##################
 ##################
+##..........****##
+##..........****##
+##......##....**##
+##......##....**##
 ##..............##
+##@.p.│...─.....##
 ##..............##
-##........##....##
-##........##....##
-##..............##
-##*.p.│...─.....##
-##..............##
-##....*...─.....##
+##....@...─.....##
 ##..####....##..##
 ##..####....##..##
 ##################
