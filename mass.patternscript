@@ -4,6 +4,8 @@ homepage menderbug.itch.io
 
 game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
+run_rules_on_level_start
+
 =====
 TAGS
 =====
@@ -12,6 +14,12 @@ U_ = up
 L_ = left
 R_ = right
 D_ = down
+
+Subtile = _BL _BR _TL _TR
+
+( There are only actual floor levels at 0 and 1, but tall jellies or stacked objects could be
+  on level higher )
+Floor = _0 _1 _2
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
 ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
@@ -24,96 +32,235 @@ OBJECTS
 ========
 
 Background
-LIGHTGREEN GREEN
-11111
-01111
-11101
-11111
-10111
+#1a1518
+
+Floor:_0:_BL
+#484a77 #4d65b4 
+00001
+00000
+00000
+00000
+00000
+
+Floor:_0:_BR
+#484a77 #4d65b4 
+copy: Floor:_0:_BL rot:>:^
+
+Floor:_0:_TL
+#484a77 #4d65b4 
+copy: Floor:_0:_BL rot:>:v
+
+Floor:_0:_TR
+#484a77 #4d65b4 
+copy: Floor:_0:_BL rot:>:<
 
 Wall
-BROWN DARKBROWN
-00010
+#313638 #323353 
+00000
+00000
+00000
+00000
+00000
 11111
-01000
 11111
-00010
+11111
+11111
+11111
+11111
+11111
+11111
 
-PlayerSprite Player
-Black Orange White Blue
-..000000..
-..000000..
+( Hides the front-facing walls in the bottom two rows of the grid )
+WallCover
+#313638
+00000
+00000
+00000
+00000
+00000
+00000
+00000
+00000
+
+WallEdgeDark:directions:Subtile
+transparent
+
+WallEdgeDark:down:_BL
+#374e4a
+.....
+0000.
+0000.
+.....
+.....
+translate:up:8
+
+WallEdgeDark:down:_BR
+#374e4a
+copy: WallEdgeDark:down:_BL |
+
+WallEdgeDark:up:_TL
+#374e4a
+.....
+.....
+0000.
+0000.
+.....
+translate:up:8
+
+WallEdgeDark:up:_TR
+#374e4a
+copy: WallEdgeDark:up:_TL |
+
+WallEdgeDark:left:_TL
+#374e4a
+..00.
+..00.
+..00.
+..00.
+.....
+translate:up:8
+
+WallEdgeDark:right:_TR
+#374e4a
+copy: WallEdgeDark:left:_TL |
+
+WallEdgeDark:left:_BL
+#374e4a
+.....
+..00.
+..00.
+..00.
+..00.
+translate:up:8
+
+WallEdgeDark:right:_BR
+#374e4a
+copy: WallEdgeDark:left:_BL |
+
+WallEdge:directions
+#0b8a8f
+.....
+.....
+.....
+00000
+00000
+rot:down:> translate:up:8
+
+( Fix up for outer corners of walls. Direction corresponds to the clockwise wall leg. )
+WallCorner:directions
+#0b8a8f #374e4a
+.....
+1111.
+1111.
+0011.
+0011.
+rot:left:> translate:up:8
+
+PlayerSprite:_0
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
 ..111111..
 ..111111..
-2222222222
-2222222222
-..333333..
-..333333..
-..33..33..
-..33..33..
+1122221111
+1122221111
+1133443311
+1133443311
+1144444411
+1144444411
+..005566..
+..005566..
+..000066..
+..000066..
+
+PlayerSprite:_1
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: PlayerSprite:_0 translate:up:4
+
+PlayerSprite:_2
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: PlayerSprite:_1 translate:up:4
 
 Jelly1x1Sprite
-Orange Yellow
-0000000000
-0000000000
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-0000000000
-0000000000
+#fbff86 #d5e04b #a2a947 
+0011110011
+0011110011
+1111111111
+1111111111
+1111001111
+1111001111
+0011111100
+0011111100
+0000110011
+0000110011
+2211222222
+2211222222
+2222221122
+2222221122
 
 Jelly1x1TallSprite
-Brown
-0000000000
-0000000000
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-0000000000
-0000000000
+#fbff86 #d5e04b #a2a947 
+0011110011
+0011110011
+1111111111
+1111111111
+1111001111
+1111001111
+0011111100
+0011111100
+0000110011
+0000110011
+1122222222
+1122222222
+2222222211
+2222222211
+1122112222
+1122112222
+2222221122
+2222221122
 
 Jelly2x1Sprite:left Jelly2x1Sprite:right
-Orange Yellow
-00000000000000000000
-00000000000000000000
-00................00
-00................00
-00................00
-00................00
-00................00
-00................00
-00000000000000000000
-00000000000000000000
+#fbff86 #d5e04b #a2a947 
+00111111110011110011
+00111111110011110011
+11110011111111111100
+11110011111111111100
+11111111001111001111
+11111111001111001111
+00111111111111111111
+00111111111111111111
+00001100001100110000
+00001100001100110000
+22112222222222221122
+22112222222222221122
+22222211222222112222
+22222211222222112222
 
 
 Jelly2x1Sprite:up Jelly2x1Sprite:down
-Orange Yellow
-0000000000
-0000000000
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-00......00
-0000000000
-0000000000
+#fbff86 #d5e04b #a2a947 
+0011110011
+0011110011
+0011111111
+0011111111
+1111001111
+1111001111
+0011111100
+0011111100
+1111110011
+1111110011
+0011111111
+0011111111
+0011001111
+0011001111
+1111111111
+1111111111
+0011111100
+0011111100
+0000110011
+0000110011
+2211222222
+2211222222
+2222221122
+2222221122
 
 _Connector:directions
 pink
@@ -124,7 +271,7 @@ pink
 .....
 rot:right:>
 
-_Player
+_Player:Floor
 transparent
 
 _Jelly1x1
@@ -201,24 +348,30 @@ pink
 _LS:LoopSection
 transparent
 
+_Subtile:Subtile
+transparent
+
 =======
 LEGEND
 =======
 
 . = Background
 # = Wall
-P = PlayerSprite
+P = PlayerSprite:_0
+ℙ = PlayerSprite:_1
 * = Jelly1x1Sprite
 │ = Jelly2x1Sprite:up
 ─ = Jelly2x1Sprite:right
 ! = Jelly1x1TallSprite
 
 
-Sprite = PlayerSprite or Jelly1x1Sprite or Jelly2x1Sprite:directions or Jelly1x1TallSprite
+Sprite = PlayerSprite:Floor or Jelly1x1Sprite or Jelly2x1Sprite:directions or Jelly1x1TallSprite
 
 _Jelly2x1 = _Jelly2x1:directions
 
 _Jelly = _Jelly1x1 or _Jelly2x1 or _Jelly1x1Tall or _TempJelly
+
+_Player = _Player:Floor
 
 ObjectType = _Jelly or _Player
 
@@ -239,6 +392,10 @@ _PendingChecked = _PendingCycle or _PendingNoCycle
 
 MovementMarker = _MovementTarget or _MovementConflict
 
+_Subtile = _Subtile:Subtile
+
+Player = PlayerSprite:Floor
+
 =======
 SOUNDS
 =======
@@ -252,10 +409,19 @@ COLLISIONLAYERS
 --<v--
 
 Background
+Floor:_0:Subtile
 Sprite, Wall
+WallCover
+directions -> WallEdgeDark:directions:Subtile
+
+--<v--
+
+directions -> WallEdge:directions
+directions -> WallCorner:directions
 
 --
 
+_Subtile
 _Player, _Jelly
 directions -> _Blocked:directions
 _Moving, _Vacated
@@ -275,13 +441,34 @@ directions -> _Connector:directions
 RULES
 ======
 
+( Only relevant on level load: fill entire level with subtile markers )
+random [ ] -> [ _Temp ]
+[ _Temp ] [ ] -> [ ] [ _Subtile:_TL ]
+right [ _Subtile:_TL | ] -> [ _Subtile:_TL | _Subtile:_TR ]
+right [ _Subtile:_TR | | ] -> [ _Subtile:_TR | _Subtile:_TL | _Subtile:_TR ]
+down [ _Subtile:_TL | ] -> [ _Subtile:_TL | _Subtile:_BL ]
+down [ _Subtile:_BL | | ] -> [ _Subtile:_BL | _Subtile:_TL | _Subtile:_BL ]
+down [ _Subtile:_TR | ] -> [ _Subtile:_TR | _Subtile:_BR ]
+down [ _Subtile:_BR | | ] -> [ _Subtile:_BR | _Subtile:_TR | _Subtile:_BR ]
+
+( Fill empty cells with lower floor tiles )
+Subtile [ no Wall _Subtile:Subtile ] -> [ _Subtile:Subtile Floor:_0:Subtile ]
+
+( Cover the bottom two rows with special wall tiles )
+down [ | ] -> [ > Background | ]
+[ stationary Background ] -> [ WallCover ]
+
+( Decorate the edges of walls )
+Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
+[ Wall no WallEdge:^ | Wall WallEdge:^ ] -> [ Wall WallCorner:> | Wall WallEdge:^ ]
+
 ( Clean up )
 [ _Connector:directions ] -> [ ]
 [ ObjectType ] -> [ ]
 
 ( Expand player. We're handling movement manually, so we replace the movement input with a marker object. )
-[ > PlayerSprite ] -> [ _Player _Moving:> _Connector:right _Connector:up ]
-[ PlayerSprite ] -> [ _Player _Connector:right _Connector:up ]
+Floor [ > PlayerSprite:Floor ] -> [ _Player:Floor _Moving:> _Connector:right _Connector:up ]
+Floor [ PlayerSprite:Floor ] -> [ _Player:Floor _Connector:right _Connector:up ]
 [ _Player _Connector:> _Connector:^ | no _Player ] -> [ _Player _Connector:> _Connector:^ | _Player _Connector:< _Connector:^ ]
 [ _Player _Moving ] [ _Player ] -> [ _Player _Moving _Processing ] [ _Player _Moving _Processing ]
 
@@ -441,7 +628,7 @@ endloop
 
 
 ( Render sprites again )
-[ _Player _Connector:right _Connector:up ] -> [ PlayerSprite _Connector:right _Connector:up ]
+Floor [ _Player:Floor _Connector:right _Connector:up ] -> [ PlayerSprite:Floor _Connector:right _Connector:up ]
 [ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
 [ _Jelly1x1Tall _Connector:right _Connector:up ] -> [ Jelly1x1TallSprite _Connector:right _Connector:up ]
 directions [ _Jelly2x1:directions _Connector:right _Connector:up no _Connector:left no _Connector:down ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
@@ -455,15 +642,19 @@ WINCONDITIONS
 LEVELS
 =======
 
-################
-#..............#
-#..............#
-#..............#
-#..............#
-#..............#
-#*.p.│...─.....#
-#..............#
-#....*...─.....#
-#..............#
-#..............#
-################
+##################
+##################
+##################
+##################
+##..............##
+##..............##
+##........##....##
+##........##....##
+##..............##
+##*.p.│...─.....##
+##..............##
+##....*...─.....##
+##..####....##..##
+##..####....##..##
+##################
+##################
