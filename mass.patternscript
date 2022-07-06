@@ -47,6 +47,18 @@ _0 _1 -> _1 _2
 HighFloor => Lower
 _1 _2 -> _0 _1
 
+Subtile => OffsetBL
+_BL _BR _TL _TR -> _BL _BR _TL _TR
+
+Subtile => OffsetBR
+_BL _BR _TL _TR -> _BR _BL _TR _TL
+
+Subtile => OffsetTL
+_BL _BR _TL _TR -> _TL _TR _BL _BR
+
+Subtile => OffsetTR
+_BL _BR _TL _TR -> _TR _TL _BR _BL
+
 ========
 OBJECTS
 ========
@@ -217,157 +229,331 @@ WallCorner:directions
 0011.
 rot:left:> translate:up:8
 
-PlayerSprite:_0
+PlayerSprite:_0:_BL
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-..111111..
-..111111..
-1122221111
-1122221111
-1133443311
-1133443311
-1144444411
-1144444411
-..005566..
-..005566..
-..000066..
-..000066..
+11222
+11334
+11334
+11444
+11444
+..005
+..005
+..000
+..000
 
-PlayerSprite:_1
+PlayerSprite:_0:_BR
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-copy: PlayerSprite:_0 translate:up:4
+21111
+43311
+43311
+44411
+44411
+566..
+566..
+066..
+066..
 
-PlayerSprite:_2
+PlayerSprite:_0:_TL
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-copy: PlayerSprite:_1 translate:up:4
-
-Jelly1x1Sprite:_0
-#fbff86 #d5e04b #a2a947 
-0011110011
-0011110011
-1111111111
-1111111111
-1111001111
-1111001111
-0011111100
-0011111100
-0000110011
-0000110011
-2211222222
-2211222222
-2222221122
-2222221122
-
-Jelly1x1Sprite:_1
-#fbff86 #d5e04b #a2a947 
-copy: Jelly1x1Sprite:_0 translate:up:4
-
-Jelly1x1Sprite:_2
-#fbff86 #d5e04b #a2a947 
-copy: Jelly1x1Sprite:_1 translate:up:4
-
-Jelly1x1TallSprite:_0
-#fbff86 #d5e04b #a2a947 
-0011110011
-0011110011
-1111111111
-1111111111
-1111001111
-1111001111
-0011111100
-0011111100
-0000110011
-0000110011
-1122222222
-1122222222
-2222222211
-2222222211
-1122112222
-1122112222
-2222221122
-2222221122
-
-Jelly1x1TallSprite:_1
-#fbff86 #d5e04b #a2a947 
-copy: Jelly1x1TallSprite:_0 translate:up:4
-
-( This shouldn't happen )
-Jelly1x1TallSprite:_2
-pink pink pink
-copy: Jelly1x1TallSprite:_1 translate:up:4
-
-( Direction indicates which side contains the other half )
-Jelly2x1Sprite:right:_0
-#fbff86 #d5e04b #a2a947 
-0011111111
-0011111111
-1111001111
-1111001111
-1111111100
-1111111100
-0011111111
-0011111111
-0000110000
-0000110000
-2211222222
-2211222222
-2222221122
-2222221122
-
-Jelly2x1Sprite:left:_0
-#fbff86 #d5e04b #a2a947 
-0011110011
-0011110011
-1111111100
-1111111100
-1111001111
-1111001111
-1111111111
-1111111111
-1100110000
-1100110000
-2222221122
-2222221122
-2222112222
-2222112222
-
-Jelly2x1Sprite:down:_0
-#fbff86 #d5e04b #a2a947 
-0011110011
-0011110011
-0011111111
-0011111111
-1111001111
-1111001111
-0011111100
-0011111100
-1111110011
-1111110011
+..111
+..111
+11222
 translate:up:4
 
-Jelly2x1Sprite:up:_0
-#fbff86 #d5e04b #a2a947 
-0011111111
-0011111111
-0011001111
-0011001111
-1111111111
-1111111111
-0011111100
-0011111100
-0000110011
-0000110011
-2211222222
-2211222222
-2222221122
-2222221122
+PlayerSprite:_0:_TR
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+111..
+111..
+21111
+translate:up:4
 
-Jelly2x1Sprite:directions:_1
-#fbff86 #d5e04b #a2a947 
-copy: Jelly2x1Sprite:directions:_0 translate:up:4
+PlayerSprite:_1:Subtile
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: PlayerSprite:_0:Subtile translate:up:4
 
-Jelly2x1Sprite:directions:_2
+PlayerSprite:_2:Subtile
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: PlayerSprite:_1:Subtile translate:up:4
+
+Jelly1x1Sprite:_0:_BL
 #fbff86 #d5e04b #a2a947 
-copy: Jelly2x1Sprite:directions:_1 translate:up:4
+11110
+00111
+00111
+00001
+00001
+22112
+22112
+22222
+22222
+
+Jelly1x1Sprite:_0:_BR
+#fbff86 #d5e04b #a2a947 
+01111
+11100
+11100
+10011
+10011
+22222
+22222
+21122
+21122
+
+Jelly1x1Sprite:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+11111
+11111
+11110
+translate:up:4
+
+Jelly1x1Sprite:_0:_TR
+#fbff86 #d5e04b #a2a947 
+10011
+10011
+11111
+11111
+01111
+translate:up:4
+
+Jelly1x1Sprite:_1:Subtile
+#fbff86 #d5e04b #a2a947 
+copy: Jelly1x1Sprite:_0:Subtile translate:up:4
+
+Jelly1x1Sprite:_2:Subtile
+#fbff86 #d5e04b #a2a947 
+copy: Jelly1x1Sprite:_1:Subtile translate:up:4
+
+Jelly1x1TallSprite:_0:_BL
+#fbff86 #d5e04b #a2a947 
+11110
+00111
+00111
+00001
+00001
+11222
+11222
+22222
+22222
+11221
+11221
+22222
+22222
+
+Jelly1x1TallSprite:_0:_BR
+#fbff86 #d5e04b #a2a947 
+01111
+11100
+11100
+10011
+10011
+22222
+22222
+22211
+22211
+12222
+12222
+21122
+21122
+
+Jelly1x1TallSprite:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+11111
+11111
+11110
+translate:up:8
+
+Jelly1x1TallSprite:_0:_TR
+#fbff86 #d5e04b #a2a947 
+10011
+10011
+11111
+11111
+01111
+translate:up:8
+
+Jelly1x1TallSprite:_1:Subtile
+#fbff86 #d5e04b #a2a947 
+copy: Jelly1x1TallSprite:_0:Subtile translate:up:4
+
+( This shouldn't happen )
+Jelly1x1TallSprite:_2:Subtile
+pink pink pink
+copy: Jelly1x1TallSprite:_1:Subtile translate:up:4
+
+( Direction indicates which side contains the other half )
+Jelly2x1Sprite:right:_0:_BL
+#fbff86 #d5e04b #a2a947 
+11111
+00111
+00111
+00001
+00001
+22112
+22112
+22222
+22222
+
+Jelly2x1Sprite:right:_0:_BR
+#fbff86 #d5e04b #a2a947 
+11100
+11111
+11111
+10000
+10000
+22222
+22222
+21122
+21122
+
+Jelly2x1Sprite:right:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+11110
+11110
+11111
+translate:up:4
+
+Jelly2x1Sprite:right:_0:_TR
+#fbff86 #d5e04b #a2a947 
+11111
+11111
+01111
+01111
+11100
+translate:up:4
+
+Jelly2x1Sprite:left:_0:_BL
+#fbff86 #d5e04b #a2a947 
+11110
+11111
+11111
+11001
+11001
+22222
+22222
+22221
+22221
+
+Jelly2x1Sprite:left:_0:_BR
+#fbff86 #d5e04b #a2a947 
+01111
+11111
+11111
+10000
+10000
+21122
+21122
+12222
+12222
+
+Jelly2x1Sprite:left:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+11111
+11111
+11110
+translate:up:4
+
+Jelly2x1Sprite:left:_0:_TR
+#fbff86 #d5e04b #a2a947 
+10011
+10011
+11100
+11100
+01111
+translate:up:4
+
+Jelly2x1Sprite:down:_0:_BL
+#fbff86 #d5e04b #a2a947 
+11110
+00111
+00111
+11111
+11111
+translate:up:4
+
+Jelly2x1Sprite:down:_0:_BR
+#fbff86 #d5e04b #a2a947 
+01111
+11100
+11100
+10011
+10011
+translate:up:4
+
+Jelly2x1Sprite:down:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+00111
+00111
+11110
+translate:up:4
+
+Jelly2x1Sprite:down:_0:_TR
+#fbff86 #d5e04b #a2a947 
+10011
+10011
+11111
+11111
+01111
+translate:up:4
+
+Jelly2x1Sprite:up:_0:_BL
+#fbff86 #d5e04b #a2a947 
+11111
+00111
+00111
+00001
+00001
+22112
+22112
+22222
+22222
+
+Jelly2x1Sprite:up:_0:_BR
+#fbff86 #d5e04b #a2a947 
+11111
+11100
+11100
+10011
+10011
+22222
+22222
+21122
+21122
+
+Jelly2x1Sprite:up:_0:_TL
+#fbff86 #d5e04b #a2a947 
+00111
+00111
+00110
+00110
+11111
+translate:up:4
+
+Jelly2x1Sprite:up:_0:_TR
+#fbff86 #d5e04b #a2a947 
+11111
+11111
+01111
+01111
+11111
+translate:up:4
+
+Jelly2x1Sprite:directions:_1:Subtile
+#fbff86 #d5e04b #a2a947 
+copy: Jelly2x1Sprite:directions:_0:Subtile translate:up:4
+
+Jelly2x1Sprite:directions:_2:Subtile
+#fbff86 #d5e04b #a2a947 
+copy: Jelly2x1Sprite:directions:_1:Subtile translate:up:4
 
 _Connector:directions:_
 transparent
@@ -384,6 +570,10 @@ transparent
 
 _ConnectorHigh:_1
 transparent
+
+( Shouldn't be used, exists for rule expansions )
+_ConnectorHigh:_2
+pink
 
 _Player:_
 transparent
@@ -500,22 +690,24 @@ LEGEND
 . = Floor:_0
 * = Floor:_1
 # = Wall
-P = PlayerSprite:_0 and Floor:_0
-ℙ = PlayerSprite:_1 and Floor:_1
-■ = Jelly1x1Sprite:_0 and Floor:_0
-□ = Jelly1x1Sprite:_1 and Floor:_1
-▌ = Jelly2x1Sprite:up:_0 and Floor:_0
-▐ = Jelly2x1Sprite:up:_1 and Floor:_1
-▄ = Jelly2x1Sprite:right:_0 and Floor:_0
-▀ = Jelly2x1Sprite:right:_1 and Floor:_1
+P = PlayerSprite:_0:_BL and Floor:_0
+ℙ = PlayerSprite:_1:_BL and Floor:_1
+■ = Jelly1x1Sprite:_0:_BL and Floor:_0
+□ = Jelly1x1Sprite:_1:_BL and Floor:_1
+▌ = Jelly2x1Sprite:up:_0:_BL and Floor:_0
+▐ = Jelly2x1Sprite:up:_1:_BL and Floor:_1
+▄ = Jelly2x1Sprite:right:_0:_BL and Floor:_0
+▀ = Jelly2x1Sprite:right:_1:_BL and Floor:_1
+! = Jelly1x1TallSprite:_0:_BL and Floor:_0
+‼ = Jelly1x1TallSprite:_1:_BL and Floor:_1
 
 Wall:_0 = Floor:_1 or Floor:_2
 Wall:_1 = Floor:_2
 Wall:_2 = Floor:_2
 
-Sprite:_0 = PlayerSprite:_0 or Jelly1x1Sprite:_0 or Jelly2x1Sprite:directions:_0 or Jelly1x1TallSprite:_0
-Sprite:_1 = PlayerSprite:_1 or Jelly1x1Sprite:_1 or Jelly2x1Sprite:directions:_1 or Jelly1x1TallSprite:_1
-Sprite:_2 = PlayerSprite:_2 or Jelly1x1Sprite:_2 or Jelly2x1Sprite:directions:_2 or Jelly1x1TallSprite:_2
+Sprite:_0 = PlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
+Sprite:_1 = PlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
+Sprite:_2 = PlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
 Sprite = Sprite:_
 
 _Jelly2x1:_0 = _Jelly2x1:directions:_0
@@ -554,8 +746,8 @@ Support:_1 = _Jelly:_0 or Floor:_1
 Support:_2 = _Jelly:_1 or Floor:_2
 
 _ConnectorVertical:_0 = _ConnectorHigh:_0
-_ConnectorVertical:_1 = _ConnectorHigh:_0 or _ConnectorHigh:_1
-_ConnectorVertical:_2 = _ConnectorHigh:_1
+_ConnectorVertical:_1 = _ConnectorHigh:_1
+_ConnectorVertical:_2 = _ConnectorHigh:_2
 _ConnectorVertical = _ConnectorVertical:_
 
 _Connector:_0 = _Connector:directions:_0 or _ConnectorVertical:_0
@@ -617,7 +809,7 @@ _FallingResolved = _FallingResolved:_
 
 _Subtile = _Subtile:Subtile
 
-Player = PlayerSprite:_
+Player = PlayerSprite:_:_BL
 
 =======
 SOUNDS
@@ -703,25 +895,26 @@ Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:
 [ ObjectType ] -> [ ]
 
 ( Expand player. We're handling movement manually, so we replace the movement input with a marker object. )
-_ [ > PlayerSprite:_ ] -> [ _Player:_ _Moving:>:_ _Connector:right:_ _Connector:up:_ ]
-_ [ PlayerSprite:_ ] -> [ _Player:_ _Connector:right:_ _Connector:up:_ ]
+_ [ > PlayerSprite:_:_BL ] -> [ _Player:_ _Moving:>:_ _Connector:right:_ _Connector:up:_ ]
+_ [ PlayerSprite:_:_BL ] -> [ _Player:_ _Connector:right:_ _Connector:up:_ ]
 _ [ _Player:_ _Connector:>:_ _Connector:^:_ | no _Player:_ ] -> [ _Player:_ _Connector:>:_ _Connector:^:_ | _Player:_ _Connector:<:_ _Connector:^:_ ]
 _ [ _Player:_ _Moving:_ ] [ _Player:_ ] -> [ _Player:_ _Moving:_ _Processing:_ ] [ _Player:_ _Moving:_ _Processing:_ ]
 
 ( Expand 1x1 jellies )
-_ [ Jelly1x1Sprite:_ ] -> [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ]
+_ [ Jelly1x1Sprite:_:_BL ] -> [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ]
 _ [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | ] -> [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | _Jelly1x1:_ _Connector:<:_ _Connector:^:_ ]
 
 ( Expand tall 1x1 jellies )
-LowFloor [ Jelly1x1TallSprite:LowFloor ] -> [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
+LowFloor [ Jelly1x1TallSprite:LowFloor:_BL ] -> [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
 LowFloor [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | ] -> [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:<:LowFloor _Connector:^:LowFloor _Connector:<:Higher _Connector:^:Higher _ConnectorVertical:LowFloor ]
 
 ( Expand 2x1 jellies )
-_ Axes [ Jelly2x1Sprite:Axes:_ ] -> [ _Jelly2x1:Axes:_ _Connector:right:_ _Connector:up:_ ]
+_ Axes [ Jelly2x1Sprite:Axes:_:_BL ] -> [ _Jelly2x1:Axes:_ _Connector:right:_ _Connector:up:_ ]
 _ [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | ] -> [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:perpendicular:_ _Connector:<:_ _Connector:perpendicular:_ ]
 _ [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -> [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:<:_ _Connector:perpendicular:_ ]
 [ _Temp:_ ] -> [ ]
-[ Jelly2x1Sprite:directions:_ ] -> [ ]
+
+[ Sprite ] -> [ ]
 
 ( Process any falling markers from a previous turn )
 HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:directions:HighFloor no Movable:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _Connector:directions:Lower ]
@@ -921,11 +1114,20 @@ endloop
 [ _FallingResolved ] -> [ ]
 
 ( Render sprites again )
-_ [ _Player:_ _Connector:right:_ _Connector:up:_ ] -> [ PlayerSprite:_ _Connector:right:_ _Connector:up:_ ]
-_ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ] -> [ Jelly1x1Sprite:_ _Connector:right:_ _Connector:up:_ ]
-LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor ] -> [ Jelly1x1TallSprite:LowFloor _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor ]
-right _ [ _Jelly2x1:right:_ _Connector:right:_ _Connector:up:_ no _Connector:left:_ no _Connector:down:_ | | ] -> [ Jelly2x1Sprite:right:_ _Connector:right:_ _Connector:up:_ | | Jelly2x1Sprite:left:_ ]
-up _ [ _Jelly2x1:up:_ _Connector:right:_ _Connector:up:_ no _Connector:left:_ no _Connector:down:_ | | ] -> [ Jelly2x1Sprite:up:_ _Connector:right:_ _Connector:up:_ | | Jelly2x1Sprite:down:_ ]
+right _ [ _Player:_ _Connector:right:_ _Connector:up:_ | ] -> [ PlayerSprite:_:_BL _Connector:right:_ _Connector:up:_ | PlayerSprite:_:_BR ]
+right _ [ _Player:_ _Connector:right:_ _Connector:down:_ | ] -> [ PlayerSprite:_:_TL _Connector:right:_ _Connector:down:_ | PlayerSprite:_:_TR ]
+
+right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | ] -> [ Jelly1x1Sprite:_:_BL _Connector:right:_ _Connector:up:_ | Jelly1x1Sprite:_:_BR ]
+right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | ] -> [ Jelly1x1Sprite:_:_TL _Connector:right:_ _Connector:down:_ | Jelly1x1Sprite:_:_TR ]
+
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_BL _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_BR ]
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_TL _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_TR ]
+
+right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:up:_ | | | ] -> [ Jelly2x1Sprite:right:_:_BL _Connector:right:_ _Connector:up:_ | Jelly2x1Sprite:right:_:_BR | Jelly2x1Sprite:left:_:_BL | Jelly2x1Sprite:left:_:_BR ]
+right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:down:_ | | | ] -> [ Jelly2x1Sprite:right:_:_TL _Connector:right:_ _Connector:down:_ | Jelly2x1Sprite:right:_:_TR | Jelly2x1Sprite:left:_:_TL | Jelly2x1Sprite:left:_:_TR ]
+
+up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:right:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BL _Connector:up:_ _Connector:right:_ | Jelly2x1Sprite:up:_:_TL | Jelly2x1Sprite:down:_:_BL | Jelly2x1Sprite:down:_:_TL ]
+up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:left:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BR _Connector:up:_ _Connector:left:_ | Jelly2x1Sprite:up:_:_TR | Jelly2x1Sprite:down:_:_BR | Jelly2x1Sprite:down:_:_TR ]
 
 ==============
 WINCONDITIONS
@@ -945,9 +1147,11 @@ P = PlayerSprite:_0 and Floor:_0
 ▐ = Jelly2x1Sprite:up:_1 and Floor:_1
 ▄ = Jelly2x1Sprite:right:_0 and Floor:_0
 ▀ = Jelly2x1Sprite:right:_1 and Floor:_1
+! = Jelly1x1TallSprite:_0 and Floor:_0
+‼ = Jelly1x1TallSprite:_1 and Floor:_1
 )
 
-##################
+################## 
 ##################
 ##################
 ##################
@@ -977,6 +1181,25 @@ P = PlayerSprite:_0 and Floor:_0
 ##********▀*****........##
 ##**************........##
 ##****▐***▀*****........##
+##**************........##
+##ℙ*************........##
+##########################
+##########################
+
+##########################
+##########################
+##########################
+##########################
+####******################
+####******################
+####************........##
+####************........##
+####************........##
+####**‼*********..!.....##
+####********************##
+####******▀*************##
+##**************........##
+##**************........##
 ##**************........##
 ##ℙ*************........##
 ##########################
