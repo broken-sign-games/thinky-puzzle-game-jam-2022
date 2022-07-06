@@ -29,6 +29,8 @@ HighFloor = _1 _2
 ( Defining an abbreviation because this appears everywhere )
 _ = Floor
 
+LiftGroup = _1 _2 _3 _4
+
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
 ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
 LoopSection = FP RM DC BC CS
@@ -229,10 +231,68 @@ WallCorner:directions
 0011.
 rot:left:> translate:up:8
 
+Lift:_0 
+#6b3e75
+
+Lift:_1
+#6b3e75 #45293f 
+00000
+00000
+00000
+00000
+00000
+11111
+11111
+11111
+11111
+
+LiftDeco:_0:Subtile
+#905ea9 
+copy: FloorDeco:_0:Subtile
+
+LiftDeco:_1:Subtile
+#a884f3
+copy: FloorDeco:_1:Subtile
+
+LiftEdge:directions:_0
+#905ea9
+.....
+.....
+.....
+00000
+00000
+rot:down:>
+
+LiftEdge:directions:_1
+#a884f3
+.....
+.....
+.....
+00000
+00000
+rot:down:> translate:up:4
+
+( Fixup for inner corners of lifts. Direction corresponds to the clockwise edge leg. )
+LiftCorner:directions:_0
+#905ea9
+.....
+.....
+.....
+00...
+00...
+rot:left:>
+
+LiftCorner:directions:_1
+#a884f3
+.....
+.....
+.....
+00...
+00...
+rot:left:> translate:up:4
+
 PlayerSprite:_0:_BL
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-11222
-11334
 11334
 11444
 11444
@@ -240,11 +300,10 @@ PlayerSprite:_0:_BL
 ..005
 ..000
 ..000
+translate:up:2
 
 PlayerSprite:_0:_BR
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-21111
-43311
 43311
 44411
 44411
@@ -252,12 +311,15 @@ PlayerSprite:_0:_BR
 566..
 066..
 066..
+translate:up:2
 
 PlayerSprite:_0:_TL
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
 ..111
 ..111
 11222
+11222
+11334
 translate:up:4
 
 PlayerSprite:_0:_TR
@@ -265,6 +327,8 @@ PlayerSprite:_0:_TR
 111..
 111..
 21111
+21111
+43311
 translate:up:4
 
 PlayerSprite:_1:Subtile
@@ -672,6 +736,9 @@ pink
 _Vacated:_
 pink
 
+_LiftGroup:LiftGroup
+transparent
+
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise. )
 _LS:LoopSection
 transparent
@@ -700,6 +767,14 @@ P = PlayerSprite:_0:_BL and Floor:_0
 ▀ = Jelly2x1Sprite:right:_1:_BL and Floor:_1
 ! = Jelly1x1TallSprite:_0:_BL and Floor:_0
 ‼ = Jelly1x1TallSprite:_1:_BL and Floor:_1
+1 = Lift:_0 and _LiftGroup:_1
+¹ = Lift:_1 and _LiftGroup:_1
+2 = Lift:_0 and _LiftGroup:_2
+² = Lift:_1 and _LiftGroup:_2
+3 = Lift:_0 and _LiftGroup:_3
+³ = Lift:_1 and _LiftGroup:_3
+4 = Lift:_0 and _LiftGroup:_4
+⁴ = Lift:_1 and _LiftGroup:_4
 
 Wall:_0 = Floor:_1 or Floor:_2
 Wall:_1 = Floor:_2
@@ -828,6 +903,10 @@ Floor:_
 FloorDeco:_:Subtile
 directions -> FloorEdge:directions
 directions -> FloorCorner:directions
+Lift:LowFloor
+LiftDeco:LowFloor:Subtile
+directions -> LiftEdge:directions:LowFloor
+directions -> LiftCorner:directions:LowFloor
 WallCover
 directions -> WallEdgeDark:directions:Subtile
 _ -> Sprite:_
@@ -841,6 +920,7 @@ directions -> WallCorner:directions
 
 _Subtile
 _ -> Movable:_
+_LiftGroup:LiftGroup
 _, directions -> _Blocked:directions:_
 _ -> _Moving:_, _Vacated:_
 _ -> _Squishing:_
@@ -884,6 +964,17 @@ _ Subtile [ Floor:_ _Subtile:Subtile ] -> [ Floor:_ _Subtile:Subtile FloorDeco:_
 ( Decorate the edges of higher floors )
 [ Floor:_1 | no Floor:_1 no Wall ] -> [ Floor:_1 FloorEdge:> | ]
 [ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
+
+( Decorate lifts )
+LowFloor Subtile [ Lift:LowFloor _Subtile:Subtile ] -> [ Lift:LowFloor _Subtile:Subtile LiftDeco:LowFloor:Subtile ]
+LowFloor [ Lift:LowFloor | no Lift:LowFloor ] -> [ Lift:LowFloor LiftEdge:>:LowFloor | ]
+LowFloor LiftGroup [ Lift:LowFloor _LiftGroup:LiftGroup | Lift:LowFloor no _LiftGroup:LiftGroup ] -> [ Lift:LowFloor _LiftGroup:LiftGroup LiftEdge:>:LowFloor | Lift:LowFloor ]
+LowFloor [ Lift:LowFloor no LiftEdge:^:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ] -> [ Lift:LowFloor LiftCorner:>:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ]
+
+( Decorate the edges of higher floors )
+[ Floor:_1 | no Floor:_1 no Wall ] -> [ Floor:_1 FloorEdge:> | ]
+[ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
+[ Floor:_1 no FloorEdge:v | Floor:_1 FloorEdge:v ] -> [ Floor:_1 FloorCorner:v | Floor:_1 FloorEdge:v ]
 
 ( Decorate the edges of walls )
 Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
@@ -1202,5 +1293,24 @@ P = PlayerSprite:_0 and Floor:_0
 ##**************........##
 ##**************........##
 ##ℙ*************........##
+##########################
+##########################
+
+##########################
+##########################
+##########################
+##########################
+####**¹¹¹¹####....########
+####**¹¹¹¹####....########
+####**¹¹********..1111..##
+####**¹¹********..1111..##
+####******²²****..1122..##
+####******²²****..1122..##
+####**⁴⁴**³³³³**..443333##
+####**⁴⁴**³³³³**..443333##
+##****⁴⁴********..44....##
+##****⁴⁴********..44....##
+##****⁴⁴********..44....##
+##ℙ***⁴⁴********..44....##
 ##########################
 ##########################
