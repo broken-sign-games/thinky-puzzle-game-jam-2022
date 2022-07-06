@@ -370,7 +370,10 @@ transparent
 _Jelly1x1:_
 transparent
 
-_Jelly1x1Tall:_
+_Jelly1x1TallLow:_
+transparent
+
+_Jelly1x1TallHigh:_
 transparent
 
 _Jelly2x1:left:_0 _Jelly2x1:right:_0
@@ -493,11 +496,17 @@ _Jelly2x1:_1 = _Jelly2x1:directions:_1
 _Jelly2x1:_2 = _Jelly2x1:directions:_2
 _Jelly2x1 = _Jelly2x1:_
 
-_Jelly:_0 = _Jelly1x1:_0 or _Jelly2x1:_0 or _Jelly1x1Tall:_0 or _TempJelly:_0
-_Jelly:_1 = _Jelly1x1:_1 or _Jelly2x1:_1 or _Jelly1x1Tall:_0 or _Jelly1x1Tall:_1 or _TempJelly:_1
-_Jelly:_2 = _Jelly1x1:_2 or _Jelly2x1:_2 or _TempJelly:_2
+_Jelly:_0 = _Jelly1x1:_0 or _Jelly2x1:_0 or _Jelly1x1TallLow:_0 or _Jelly1x1TallHigh:_0 or _TempJelly:_0
+_Jelly:_1 = _Jelly1x1:_1 or _Jelly2x1:_1 or _Jelly1x1TallLow:_1 or _Jelly1x1TallHigh:_1 or _TempJelly:_1
+_Jelly:_2 = _Jelly1x1:_2 or _Jelly2x1:_2 or _Jelly1x1TallLow:_2 or _Jelly1x1TallHigh:_2 or _TempJelly:_2
 _Jelly = _Jelly:_
 
+_Jelly1x1TallLow = _Jelly1x1TallLow:_
+_Jelly1x1TallHigh = _Jelly1x1TallHigh:_
+
+_Jelly1x1Tall:_0 = _Jelly1x1TallLow:_0 or _Jelly1x1TallHigh:_0
+_Jelly1x1Tall:_1 = _Jelly1x1TallLow:_1 or _Jelly1x1TallHigh:_1
+_Jelly1x1Tall:_2 = _Jelly1x1TallLow:_2 or _Jelly1x1TallHigh:_2
 _Jelly1x1Tall = _Jelly1x1Tall:_
 
 _Player = _Player:_
@@ -505,8 +514,8 @@ _Player = _Player:_
 ObjectType = _Jelly or _Player
 
 RigidMovable:_0 = _Jelly1x1:_0 or _Jelly1x1Tall:_0 or _Player:_0
-RigidMovable:_1 = _Jelly1x1:_1 or _Jelly1x1Tall:_0 or _Jelly1x1Tall:_1 or _Player:_1
-RigidMovable:_2 = _Jelly1x1:_2 or _Player:_2
+RigidMovable:_1 = _Jelly1x1:_1 or _Jelly1x1Tall:_1 or _Player:_1
+RigidMovable:_2 = _Jelly1x1:_2 or _Jelly1x1Tall:_2 or _Player:_2
 RigidMovable = RigidMovable:_
 
 Movable:_0 = _Jelly:_0 or _Player:_0
@@ -559,6 +568,11 @@ Status:_1 = _Unprocessed:_1 or _Processing:_1 or _Pending:_1 or _PendingChecking
 Status:_2 = _Unprocessed:_2 or _Processing:_2 or _Pending:_2 or _PendingChecking:_2 or _Processed:_2
 Status = Status:_
 
+_Pending = _Pending:_
+_PendingNoCycle = _PendingNoCycle:_
+_Unprocessed = _Unprocessed:_
+_Processed = _Processed:_
+
 _PendingChecked:_0 = _PendingCycle:_0 or _PendingNoCycle:_0
 _PendingChecked:_1 = _PendingCycle:_1 or _PendingNoCycle:_1
 _PendingChecked:_2 = _PendingCycle:_2 or _PendingNoCycle:_2
@@ -601,7 +615,7 @@ directions -> WallCorner:directions
 --
 
 _Subtile
-_ -> _Jelly1x1:_, _Jelly2x1:_, _Jelly1x1Tall:_, _TempJelly:_, _Player:_
+_ -> Movable:_
 _, directions -> _Blocked:directions:_
 _ -> _Moving:_, _Vacated:_
 _ -> _Squishing:_
@@ -656,7 +670,7 @@ Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:
 ( Expand player. We're handling movement manually, so we replace the movement input with a marker object. )
 _ [ > PlayerSprite:_ ] -> [ _Player:_ _Moving:>:_ _Connector:right:_ _Connector:up:_ ]
 _ [ PlayerSprite:_ ] -> [ _Player:_ _Connector:right:_ _Connector:up:_ ]
-_ [ _Player _Connector:>:_ _Connector:^:_ | no _Player ] -> [ _Player _Connector:>:_ _Connector:^:_ | _Player _Connector:<:_ _Connector:^:_ ]
+_ [ _Player:_ _Connector:>:_ _Connector:^:_ | no _Player:_ ] -> [ _Player:_ _Connector:>:_ _Connector:^:_ | _Player:_ _Connector:<:_ _Connector:^:_ ]
 _ [ _Player:_ _Moving:_ ] [ _Player:_ ] -> [ _Player:_ _Moving:_ _Processing:_ ] [ _Player:_ _Moving:_ _Processing:_ ]
 
 ( Expand 1x1 jellies )
@@ -664,8 +678,8 @@ _ [ Jelly1x1Sprite:_ ] -> [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ]
 _ [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | ] -> [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | _Jelly1x1:_ _Connector:<:_ _Connector:^:_ ]
 
 ( Expand tall 1x1 jellies )
-LowFloor [ Jelly1x1TallSprite:LowFloor ] -> [ _Jelly1x1Tall:LowFloor _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
-_ [ _Jelly1x1Tall _Connector:>:_ _Connector:^:_ _ConnectorVertical:_ | ] -> [ _Jelly1x1Tall _Connector:>:_ _Connector:^:_ _ConnectorVertical:_ | _Jelly1x1Tall:_ _Connector:<:_ _Connector:^:_ _ConnectorVertical:_ ]
+LowFloor [ Jelly1x1TallSprite:LowFloor ] -> [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
+LowFloor [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | ] -> [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:<:LowFloor _Connector:^:LowFloor _Connector:<:Higher _Connector:^:Higher _ConnectorVertical:LowFloor ]
 
 ( Expand 2x1 jellies )
 _ Axes [ Jelly2x1Sprite:Axes:_ ] -> [ _Jelly2x1:Axes:_ _Connector:right:_ _Connector:up:_ ]
@@ -698,8 +712,8 @@ startloop
   ( Propagate movement to unprocessed movables )
   _ [ _LS:FP ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ no _Connector:>:_ | Movable:_ no _Moving:_ no _Blocked:>:_ ] -> [ _LS:FP _Rerun _CheckMovement ] [ Movable:_ _Moving:>:_ | Movable:_ _Moving:>:_ _Processing:_ no _Blocked:_ ]
   _ [ _LS:FP ] [ Movable:_ _Moving:_ _Connector:>:_ | Movable:_ no _Moving:_ ] -> [ _LS:FP _Rerun ] [ Movable:_ _Moving:_ _Connector:>:_ | Movable:_ _Moving:_ _Processing:_ no _Blocked:_ ]
-  LowFloor [ _LS:FP ] [ Movable:LowFloor _Moving:LowFloor _ConnectorHigh:LowFloor no _Moving:Higher ] -> [ _LS:FP _Rerun ] [ Movable:LowFloor _Moving:LowFloor _ConnectorHigh:LowFloor _Moving:Higher _Processing:Higher no _Blocked:Higher ]
-  LowFloor [ _LS:FP ] [ Movable:LowFloor _Moving:Higher _ConnectorHigh:LowFloor no _Moving:LowFloor ] -> [ _LS:FP _Rerun ] [ Movable:LowFloor _Moving:Higher _ConnectorHigh:LowFloor _Moving:LowFloor _Processing:LowFloor no _Blocked:LowFloor ]
+  LowFloor directions [ _LS:FP ] [ Movable:LowFloor _Moving:directions:LowFloor _ConnectorHigh:LowFloor no _Moving:Higher ] -> [ _LS:FP _Rerun ] [ Movable:LowFloor _Moving:directions:LowFloor _ConnectorHigh:LowFloor _Moving:directions:Higher _Processing:Higher no _Blocked:Higher ]
+  LowFloor directions [ _LS:FP ] [ Movable:LowFloor _Moving:directions:Higher _ConnectorHigh:LowFloor no _Moving:LowFloor ] -> [ _LS:FP _Rerun ] [ Movable:LowFloor _Moving:directions:Higher _ConnectorHigh:LowFloor _Moving:directions:LowFloor _Processing:LowFloor no _Blocked:LowFloor ]
 
   [ _LS:FP no _Rerun ] -> [ _LS:RM ]
   [ _LS:FP _Rerun ] -> [ _LS:FP ]
@@ -711,18 +725,16 @@ startloop
   _ [ _LS:RM _CheckMovement ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Connector:>:_ no _Temp:_ | _MovementTarget:_ ] -> [ _LS:RM _CheckMovement ] [ Movable:_ _Moving:>:_ _Processing:_ _Temp:_ | _MovementConflict:_ ]
   [ _LS:RM _CheckMovement ] [ _Temp:_ ] -> [ _LS:RM _CheckMovement ] [ ]
   _ [ _LS:RM _CheckMovement ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ no _Connector:>:_ | _MovementConflict:_ ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:_ _Moving:>:_ _Blocked:>:_ _Processing:_ | _MovementConflict:_ ]
-  _ directions [ _LS:RM _CheckMovement ] [ Movable:_ _Moving:directions:_ _Blocked:directions:_ _Connector:>:_ | Movable:_ _Moving:directions:_ ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:_ _Moving:directions:_ _Blocked:directions:_ _Connector:>:_ | Movable:_ _Moving:directions:_ _Blocked:directions:_ ]
-  LowFloor directions [ _LS:RM _CheckMovement ] [ Movable:LowFloor _Blocked:directions:LowFloor _ConnectorHigh:LowFloor ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:LowFloor _Blocked:directions:LowFloor _ConnectorHigh:LowFloor _Blocked:directions:Higher ]
-  LowFloor directions [ _LS:RM _CheckMovement ] [ Movable:LowFloor _Blocked:directions:Higher _ConnectorHigh:LowFloor ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:LowFloor _Blocked:directions:LowFloor _ConnectorHigh:LowFloor _Blocked:directions:LowFloor ]
+  _ directions [ _LS:RM _CheckMovement ] [ Movable:_ _Moving:directions:_ _Blocked:directions:_ _Connector:>:_ | Movable:_ _Moving:directions:_ no _Blocked:directions:_ ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:_ _Moving:directions:_ _Blocked:directions:_ _Connector:>:_ | Movable:_ _Moving:directions:_ _Blocked:directions:_ ]
+  LowFloor directions [ _LS:RM _CheckMovement ] [ Movable:LowFloor _Blocked:directions:LowFloor _ConnectorHigh:LowFloor no _Blocked:directions:Higher ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:LowFloor _Blocked:directions:LowFloor _ConnectorHigh:LowFloor _Blocked:directions:Higher ]
+  LowFloor directions [ _LS:RM _CheckMovement ] [ Movable:LowFloor _Blocked:directions:Higher _ConnectorHigh:LowFloor no _Blocked:directions:LowFloor ] -> [ _LS:RM _CheckMovement _Rerun ] [ Movable:LowFloor _Blocked:directions:Higher _ConnectorHigh:LowFloor _Blocked:directions:LowFloor ]
   [ _LS:RM _CheckMovement ] [ MovementMarker ] -> [ _LS:RM _CheckMovement ] [ ]
   [ _LS:RM _CheckMovement ] -> [ _LS:RM ]
     
   ( Movables that are still marked as processing can move freely, so we perform the move and mark them as
     processed and blocked. To move all the things belonging to a movable, we move everything out of the moving
-    cell into the empty cell, then move the movement marker and repeat.
-    Tall jellies need special treatment because there's only one Movable to be moved. )
+    cell into the empty cell, then move the movement marker and repeat. )
   _ [ _LS:RM ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Connector:_ no _Squishing:_ | no Movable:_ ] -> [ _LS:RM _Rerun ] [ Movable:_ _Moving:>:_ _Processing:_ | _Connector:_ ]
-  + LowFloor [ _LS:RM ] [ _Jelly1x1Tall:LowFloor _Moving:>:Higher no _Blocked:>:Higher _Processing:Higher no _Squishing:Higher | no Movable:Higher ] -> [ _LS:RM _Rerun ] [ _Jelly1x1Tall:LowFloor _Vacated:Higher | _BlockedExcept:>:Higher _Processed:Higher no _Vacated:Higher ]
   + _ [ _LS:RM ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Squishing:_ | no Movable:_ ] -> [ _LS:RM _Rerun ] [ _Vacated:_ | Movable:_ _BlockedExcept:>:_ _Processed:_ no _Vacated:_ ]
   
   ( Squishing objects that are still marked as processing can squish freely. We handle the different squishing
@@ -746,8 +758,8 @@ startloop
   ( Squish 2x1 into a tall 1x1 if both sides are blocked. )
   ( TODO: Should block the squish if this happens on the top floor or there's an object on top of the front 1x1. )
   LowFloor [ _LS:RM ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor ]
-  LowFloor [ _LS:RM ] [ _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:>:LowFloor no _Connector:<:LowFloor | _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor no _Connector:>:LowFloor ] -> [ _LS:RM _Rerun ] [ _Vacated:LowFloor no _Connector:LowFloor | _Vacated:LowFloor no _Connector:LowFloor | _Jelly1x1Tall:LowFloor no _Moving:LowFloor _Connector:>:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher | _Jelly1x1Tall:LowFloor no _Moving:LowFloor _Connector:<:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher ]
-  LowFloor directions [ _LS:RM ] [ _Jelly1x1Tall:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor ] -> [ _LS:RM _Rerun ] [ _Jelly1x1Tall:LowFloor _Connector:directions:LowFloor _Connector:directions:Higher _ConnectorHigh:LowFloor ]
+  LowFloor [ _LS:RM ] [ _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:>:LowFloor no _Connector:<:LowFloor | _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor no _Connector:>:LowFloor ] -> [ _LS:RM _Rerun ] [ _Vacated:LowFloor no _Connector:LowFloor | _Vacated:LowFloor no _Connector:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:>:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:<:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher ]
+  LowFloor directions [ _LS:RM ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor no _Connector:directions:Higher ] -> [ _LS:RM _Rerun ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor _Connector:directions:Higher ]
 
   ( If at this point a pending movable points at a vacated cell, we revert it to processing to check it again next
     iteration )
@@ -776,9 +788,13 @@ startloop
   _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Processing:_ _Blocked:<:_ _Moving:<:_ _Squishing:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Processing:_ _Moving:>:_ no _Blocked:>:_ _Squishing:_ | ] -> [ _LS:RM _Rerun _CheckMovement ] [ _Jelly2x1:perpendicular:_ _Processing:_ _Blocked:<:_ _Moving:<:_ _Squishing:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Processing:_ _Moving:>:_ _Squishing:_ _Connector:>:_ | _TempJelly:_ _Processing:_ _Moving:>:_ _Squishing:_ _Connector:<:_ ]
   
   ( Blocked objects propagate this status backwards )
-  [ _LS:RM ] [ Movable _Moving:> no _Blocked:> no _Connector:> | Movable _Processed _Blocked:> ] -> [ _LS:RM _Rerun ] [ Movable _Processing _Moving:> _FullyBlocked | Movable _Processed _Blocked:> ]
-  directions [ _LS:RM ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions no _Blocked ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _FullyBlocked _Connector:> | Movable _Moving:directions _FullyBlocked ]
-  directions [ _LS:RM ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Pending ] -> [ _LS:RM _Rerun ] [ Movable _Moving:directions _Processing _Connector:> | Movable _Moving:directions _Processing ]
+  _ [ _LS:RM ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ no _Connector:>:_ | Movable:_ _Processed:_ _Blocked:>:_ ] -> [ _LS:RM _Rerun ] [ Movable:_ _Processing:_ _Moving:>:_ _FullyBlocked:_ | Movable:_ _Processed:_ _Blocked:>:_ ]
+  _ directions [ _LS:RM ] [ Movable:_ _Moving:directions:_ _FullyBlocked:_ _Connector:>:_ | Movable:_ _Moving:directions:_ no _Blocked:_ ] -> [ _LS:RM _Rerun ] [ Movable:_ _Moving:directions:_ _FullyBlocked:_ _Connector:>:_ | Movable:_ _Moving:directions:_ _FullyBlocked:_ ]
+  LowFloor [ _LS:RM ] [ Movable:LowFloor _FullyBlocked:LowFloor _ConnectorHigh:LowFloor no _Blocked:Higher ] -> [ _LS:RM _Rerun ] [ Movable:LowFloor _FullyBlocked:LowFloor _ConnectorHigh:LowFloor _FullyBlocked:Higher ]
+  LowFloor [ _LS:RM ] [ Movable:LowFloor _FullyBlocked:Higher _ConnectorHigh:LowFloor no _Blocked:LowFloor ] -> [ _LS:RM _Rerun ] [ Movable:LowFloor _FullyBlocked:Higher _ConnectorHigh:LowFloor _FullyBlocked:LowFloor ]
+  _ directions [ _LS:RM ] [ Movable:_ _Moving:directions:_ _Processing:_ _Connector:>:_ | Movable:_ _Moving:directions:_ _Pending:_ ] -> [ _LS:RM _Rerun ] [ Movable:_ _Moving:directions:_ _Processing:_ _Connector:>:_ | Movable:_ _Moving:directions:_ _Processing:_ ]
+  LowFloor [ _LS:RM ] [ Movable:LowFloor _Processing:LowFloor _ConnectorHigh:LowFloor _Pending:Higher ] -> [ _LS:RM _Rerun ] [ Movable:LowFloor _Processing:LowFloor _ConnectorHigh:LowFloor _Processing:Higher ]
+  LowFloor [ _LS:RM ] [ Movable:LowFloor _Processing:Higher _ConnectorHigh:LowFloor _Pending:LowFloor ] -> [ _LS:RM _Rerun ] [ Movable:LowFloor _Processing:Higher _ConnectorHigh:LowFloor _Processing:LowFloor ]
   
   [ _LS:RM no _Rerun ] -> [ _LS:DC ]
   [ _LS:RM _Rerun ] -> [ _LS:FP ]
@@ -787,29 +803,35 @@ startloop
   [ _LS:DC ] [ _Pending ] -> [ _LS:DC _Temp ] [ _Pending ]
     
   ( Pick a pending object to process )
-  [ _LS:DC _Temp ] [ _Pending no _PendingChecked _Moving:> no _Connector:> | _Pending ]  -> [ _LS:DC _RerunDC ] [ _Pending _Moving:> _Temp | _PendingChecking ]
+  _ [ _LS:DC _Temp ] [ _Pending:_ no _PendingChecked:_ _Moving:>:_ no _Connector:>:_ | _Pending:_ ]  -> [ _LS:DC _RerunDC ] [ _Pending:_ _Moving:>:_ _Temp:_ | _PendingChecking:_ ]
   
   ( Spread the PendingChecking status to all objects the marked one indirectly depends on )
-  directions [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _Pending ] -> [ _LS:DC ] [ _PendingChecking _Moving:directions _Connector:> | _Moving:directions _PendingChecking ]
-  + [ _LS:DC ] [ _PendingChecking _Moving:> no _Connector:> | _Pending ] -> [ _LS:DC ] [ _PendingChecking _Moving:> | _PendingChecking ]
+  _ directions [ _LS:DC ] [ _PendingChecking:_ _Moving:directions:_ _Connector:>:_ | _Moving:directions:_ _Pending:_ ] -> [ _LS:DC ] [ _PendingChecking:_ _Moving:directions:_ _Connector:>:_ | _Moving:directions:_ _PendingChecking:_ ]
+  + LowFloor [ _LS:DC ] [ _PendingChecking:LowFloor _ConnectorHigh:LowFloor _Pending:Higher ] -> [ _LS:DC ] [ _PendingChecking:LowFloor _ConnectorHigh:LowFloor _PendingChecking:Higher ]
+  + LowFloor [ _LS:DC ] [ _PendingChecking:Higher _ConnectorHigh:LowFloor _Pending:LowFloor ] -> [ _LS:DC ] [ _PendingChecking:Higher _ConnectorHigh:LowFloor _PendingChecking:LowFloor ]
+  + _ [ _LS:DC ] [ _PendingChecking:_ _Moving:>:_ no _Connector:>:_ | _Pending:_ ] -> [ _LS:DC ] [ _PendingChecking:_ _Moving:>:_ | _PendingChecking:_ ]
   
   ( If the marked object was itself marked as PendingChecking, it's part of a cycle )
-  [ _LS:DC ] [ _Temp _PendingChecking  ] -> [ _LS:DC ] [ _Temp _PendingChecking _PendingCycle ]
-  [ _LS:DC ] [ _Temp _Pending ] -> [ _LS:DC ] [ _Temp _Pending _PendingNoCycle ]
+  _ [ _LS:DC ] [ _Temp:_ _PendingChecking:_ ] -> [ _LS:DC ] [ _Temp:_ _PendingChecking:_ _PendingCycle:_ ]
+  _ [ _LS:DC ] [ _Temp:_ _Pending:_ ] -> [ _LS:DC ] [ _Temp:_ _Pending:_ _PendingNoCycle:_ ]
   
   ( Spread the PendingChecked status to the entire object )
-  directions [ _LS:DC ] [ _PendingChecked _Moving:directions _Connector:> | _Moving:directions no _PendingChecked ] -> [ _LS:DC ] [ _PendingChecked _Moving:directions _Connector:> | _Moving:directions _PendingChecked ]
+  _ directions [ _LS:DC ] [ _PendingChecked:_ _Moving:directions:_ _Connector:>:_ | _Moving:directions:_ no _PendingChecked:_ ] -> [ _LS:DC ] [ _PendingChecked:_ _Moving:directions:_ _Connector:>:_ | _Moving:directions:_ _PendingChecked:_ ]
+  LowFloor [ _LS:DC ] [ _PendingCycle:LowFloor _ConnectorHigh:LowFloor no _PendingChecked:Higher ] -> [ _LS:DC ] [ _PendingCycle:LowFloor _ConnectorHigh:LowFloor _PendingCycle:Higher ]
+  LowFloor [ _LS:DC ] [ _PendingNoCycle:LowFloor _ConnectorHigh:LowFloor no _PendingChecked:Higher ] -> [ _LS:DC ] [ _PendingNoCycle:LowFloor _ConnectorHigh:LowFloor _PendingNoCycle:Higher ]
+  LowFloor [ _LS:DC ] [ _PendingCycle:Higher _ConnectorHigh:LowFloor no _PendingChecked:LowFloor ] -> [ _LS:DC ] [ _PendingCycle:Higher _ConnectorHigh:LowFloor _PendingCycle:LowFloor ]
+  LowFloor [ _LS:DC ] [ _PendingNoCycle:Higher _ConnectorHigh:LowFloor no _PendingChecked:LowFloor ] -> [ _LS:DC ] [ _PendingNoCycle:Higher _ConnectorHigh:LowFloor _PendingNoCycle:LowFloor ]
   
   ( Clean up PendingChecking status and move the temp marker back to the top left corner )
-  [ _LS:DC ] [ _PendingChecking ] -> [ _LS:DC ] [ _Pending ]
-  [ _LS:DC ] [ _Temp no _LS:DC ] -> [ _LS:DC _Temp ] [ ]
+  _ [ _LS:DC ] [ _PendingChecking:_ ] -> [ _LS:DC ] [ _Pending:_ ]
+  [ _LS:DC ] [ _Temp:_ no _LS:DC ] -> [ _LS:DC _Temp ] [ ]
   
   ( Once we stop finding pending objects to check, we move on to resolving the cycles we found. )
   [ _LS:DC _Temp ] -> [ _LS:DC ]
   [ _LS:DC no _RerunDC ] -> [ _LS:BC ]
   [ _LS:DC _RerunDC ] -> [ _LS:DC ]
     
-  [ _LS:BC ] [ _Pending _PendingCycle ] -> [ _LS:BC _Rerun ] [ _Processing _FullyBlocked ]
+  _ [ _LS:BC ] [ _Pending:_ _PendingCycle:_ ] -> [ _LS:BC _Rerun ] [ _Processing:_ _FullyBlocked:_ ]
   [ _LS:BC ] [ _PendingNoCycle ] -> [ _LS:BC ] [ ]
   
   [ _LS:BC no _Rerun] -> [ _LS:CS ]
@@ -823,7 +845,7 @@ startloop
   
   [ _LS:CS no _RunSecondStep ] -> [ ]
   
-  [ _LS:CS > _RunSecondStep ] [ _Player no _Moving ] -> [ _LS:CS > _RunSecondStep ] [ _Player _Moving:> _Processing ]
+  _ [ _LS:CS > _RunSecondStep ] [ _Player:_ no _Moving:_ ] -> [ _LS:CS > _RunSecondStep ] [ _Player:_ _Moving:>:_ _Processing:_ ]
   [ _LS:CS _RunSecondStep ] -> [ _LS:FP ]
 endloop
 
@@ -831,10 +853,10 @@ endloop
 
 
 ( Render sprites again )
-_ [ _Player:_ _Connector:right _Connector:up ] -> [ PlayerSprite:_ _Connector:right _Connector:up ]
-[ _Jelly1x1 _Connector:right _Connector:up ] -> [ Jelly1x1Sprite _Connector:right _Connector:up ]
-[ _Jelly1x1Tall _Connector:right _Connector:up ] -> [ Jelly1x1TallSprite _Connector:right _Connector:up ]
-directions [ _Jelly2x1:directions _Connector:right _Connector:up no _Connector:left no _Connector:down ] -> [ Jelly2x1Sprite:directions _Connector:right _Connector:up ]
+_ [ _Player:_ _Connector:right:_ _Connector:up:_ ] -> [ PlayerSprite:_ _Connector:right:_ _Connector:up:_ ]
+_ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ] -> [ Jelly1x1Sprite:_ _Connector:right:_ _Connector:up:_ ]
+LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor ] -> [ Jelly1x1TallSprite:LowFloor _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor ]
+_ directions [ _Jelly2x1:directions:_ _Connector:right:_ _Connector:up:_ no _Connector:left:_ no _Connector:down:_ ] -> [ Jelly2x1Sprite:directions:_ _Connector:right:_ _Connector:up:_ ]
 
 ==============
 WINCONDITIONS
@@ -870,5 +892,23 @@ P = PlayerSprite:_0 and Floor:_0
 ##....■...▄.....##
 ##..####....##..##
 ##..####....##..##
+##################
+##################
+
+
+##################
+##################
+##################
+##################
+##**************##
+##**************##
+##**************##
+##**□***********##
+##**************##
+##********▀*****##
+##**************##
+##****▐***▀*****##
+##**************##
+##ℙ*************##
 ##################
 ##################
