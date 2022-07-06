@@ -291,6 +291,202 @@ LiftCorner:directions:_1
 00...
 rot:left:> translate:up:4
 
+Wire:left:_0:_BL
+#a24b6f 
+00000
+.....
+.....
+.....
+.....
+ 
+Wire:right:_0:_BL
+#a24b6f 
+....0
+.....
+.....
+.....
+.....
+
+Wire:down:_0:_BL
+#a24b6f 
+....0
+....0
+....0
+....0
+....0
+
+Wire:up:_0:_BL
+#a24b6f 
+copy: Wire:right:_0:_BL
+
+Wire:left:_0:_BR
+#a24b6f 
+0....
+.....
+.....
+.....
+.....
+
+Wire:up:_0:_BR
+#a24b6f 
+copy: Wire:left:_0:_BR
+
+Wire:right:_0:_BR
+#a24b6f 
+00000
+.....
+.....
+.....
+.....
+
+Wire:down:_0:_BR
+#a24b6f 
+0....
+0....
+0....
+0....
+0....
+
+Wire:right:_0:_TL
+#a24b6f 
+.....
+.....
+.....
+.....
+....0
+
+Wire:down:_0:_TL
+#a24b6f 
+copy: Wire:right:_0:_TL
+
+Wire:left:_0:_TL
+#a24b6f 
+.....
+.....
+.....
+.....
+00000
+
+Wire:up:_0:_TL
+#a24b6f 
+....0
+....0
+....0
+....0
+....0
+
+Wire:left:_0:_TR
+#a24b6f 
+.....
+.....
+.....
+.....
+0....
+
+Wire:down:_0:_TR
+#a24b6f 
+copy: Wire:left:_0:_TR
+
+Wire:right:_0:_TR
+#a24b6f 
+.....
+.....
+.....
+.....
+00000
+
+Wire:up:_0:_TR
+#a24b6f 
+0....
+0....
+0....
+0....
+0....
+
+Wire:directions:_1:Subtile
+#ed8099 
+copy: Wire:directions:_0:Subtile
+translate:up:4
+
+Wire:down:_1:_BL
+#ed8099 #753c54
+....0
+....0
+....0
+....0
+....0
+....1
+....1
+....1
+....1
+
+Wire:down:_1:_BR
+#ed8099 #753c54
+0....
+0....
+0....
+0....
+0....
+1....
+1....
+1....
+1....
+
+WireEdge:directions:Subtile
+transparent
+
+WireEdge:down:_BL
+#fca790
+.....
+.....
+.....
+....0
+....0
+translate:up:4
+
+WireEdge:down:_BR
+#fca790
+copy: WireEdge:down:_BL |
+
+WireEdge:up:_TL
+#fca790
+....0
+....0
+.....
+.....
+.....
+translate:up:4
+
+WireEdge:up:_TR
+#fca790
+copy: WireEdge:up:_TL |
+
+WireEdge:left:_TL
+#fca790
+.....
+.....
+.....
+.....
+00...
+translate:up:4
+
+WireEdge:left:_BL
+#fca790
+00...
+.....
+.....
+.....
+.....
+translate:up:4
+
+WireEdge:right:_TR
+#fca790
+copy: WireEdge:left:_TL |
+
+WireEdge:right:_BR
+#fca790
+copy: WireEdge:left:_BL |
+
 PlayerSprite:_0:_BL
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
 11334
@@ -775,10 +971,27 @@ P = PlayerSprite:_0:_BL and Floor:_0
 ³ = Lift:_1 and _LiftGroup:_3
 4 = Lift:_0 and _LiftGroup:_4
 ⁴ = Lift:_1 and _LiftGroup:_4
+─ = Wire:left:_0:_BL and Wire:right:_0:_BL and Floor:_0
+│ = Wire:up:_0:_BL and Wire:down:_0:_BL and Floor:_0
+┌ = Wire:down:_0:_BL and Wire:right:_0:_BL and Floor:_0
+┐ = Wire:left:_0:_BL and Wire:down:_0:_BL and Floor:_0
+└ = Wire:up:_0:_BL and Wire:right:_0:_BL and Floor:_0
+┘ = Wire:left:_0:_BL and Wire:up:_0:_BL and Floor:_0
+═ = Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+║ = Wire:up:_1:_BL and Wire:down:_1:_BL and Floor:_1
+╔ = Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+╗ = Wire:left:_1:_BL and Wire:down:_1:_BL and Floor:_1
+╚ = Wire:up:_1:_BL and Wire:right:_1:_BL and Floor:_1
+╝ = Wire:left:_1:_BL and Wire:up:_1:_BL and Floor:_1
 
 Wall:_0 = Floor:_1 or Floor:_2
 Wall:_1 = Floor:_2
 Wall:_2 = Floor:_2
+
+WireHigh:left = Wire:left:_1:Subtile
+WireHigh:right = Wire:right:_1:Subtile
+WireHigh:up = Wire:up:_1:Subtile
+WireHigh:down = Wire:down:_1:Subtile
 
 Sprite:_0 = PlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
 Sprite:_1 = PlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
@@ -903,6 +1116,8 @@ Floor:_
 FloorDeco:_:Subtile
 directions -> FloorEdge:directions
 directions -> FloorCorner:directions
+directions, Subtile -> Wire:directions:LowFloor:Subtile
+directions -> WireEdge:directions:Subtile
 Lift:LowFloor
 LiftDeco:LowFloor:Subtile
 directions -> LiftEdge:directions:LowFloor
@@ -979,6 +1194,12 @@ LowFloor [ Lift:LowFloor no LiftEdge:^:LowFloor | Lift:LowFloor LiftEdge:^:LowFl
 ( Decorate the edges of walls )
 Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
 [ Wall no WallEdge:^ | Wall WallEdge:^ ] -> [ Wall WallCorner:> | Wall WallEdge:^ ]
+
+( Complete wires with remaining subtiles )
+right directions LowFloor [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ Wire:directions:LowFloor:_BR | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BR | Wire:directions:LowFloor:_TR Floor:LowFloor ]
+directions Subtile [ FloorEdge:directions WireHigh:directions _Subtile:Subtile ] -> [ FloorEdge:directions WireHigh:directions _Subtile:Subtile WireEdge:directions:Subtile ]
 
 ( Clean up )
 ( TODO: this is probably unnecessary )
@@ -1240,6 +1461,26 @@ P = PlayerSprite:_0 and Floor:_0
 ▀ = Jelly2x1Sprite:right:_1 and Floor:_1
 ! = Jelly1x1TallSprite:_0 and Floor:_0
 ‼ = Jelly1x1TallSprite:_1 and Floor:_1
+1 = Lift:_0 and _LiftGroup:_1
+¹ = Lift:_1 and _LiftGroup:_1
+2 = Lift:_0 and _LiftGroup:_2
+² = Lift:_1 and _LiftGroup:_2
+3 = Lift:_0 and _LiftGroup:_3
+³ = Lift:_1 and _LiftGroup:_3
+4 = Lift:_0 and _LiftGroup:_4
+⁴ = Lift:_1 and _LiftGroup:_4
+─ = Wire:left:_0 and Wire:right:_0 and Floor:_0
+│ = Wire:up:_0 and Wire:down:_0 and Floor:_0
+┌ = Wire:down:_0 and Wire:right:_0 and Floor:_0
+┐ = Wire:left:_0 and Wire:down:_0 and Floor:_0
+└ = Wire:up:_0 and Wire:right:_0 and Floor:_0
+┘ = Wire:left:_0 and Wire:up:_0 and Floor:_0
+═ = Wire:left:_1 and Wire:right:_1 and Floor:_1
+║ = Wire:up:_1 and Wire:down:_1 and Floor:_1
+╔ = Wire:down:_1 and Wire:right:_1 and Floor:_1
+╗ = Wire:left:_1 and Wire:down:_1 and Floor:_1
+╚ = Wire:up:_1 and Wire:right:_1 and Floor:_1
+╝ = Wire:left:_1 and Wire:up:_1 and Floor:_1
 )
 
 ################## 
@@ -1302,15 +1543,15 @@ P = PlayerSprite:_0 and Floor:_0
 ##########################
 ####**¹¹¹¹####....########
 ####**¹¹¹¹####....########
-####**¹¹********..1111..##
-####**¹¹********..1111..##
-####******²²****..1122..##
-####******²²****..1122..##
-####**⁴⁴**³³³³**..443333##
-####**⁴⁴**³³³³**..443333##
-##****⁴⁴********..44....##
-##****⁴⁴********..44....##
-##****⁴⁴********..44....##
-##ℙ***⁴⁴********..44....##
+####**¹¹║*******..1111..##
+####**¹¹║*╔═══╗*..1111..##
+####****║*²²**│...1122..##
+####****║*²²**└───1122..##
+####**⁴⁴║*³³³³....443333##
+####**⁴⁴║*³³³³┌───443333##
+##****⁴⁴║*****║*..44....##
+##****⁴⁴╚═════╝*┌─44....##
+##****⁴⁴********│.44....##
+##ℙ***⁴⁴════════┘.44....##
 ##########################
 ##########################
