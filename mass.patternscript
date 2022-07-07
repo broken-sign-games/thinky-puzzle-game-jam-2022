@@ -535,6 +535,46 @@ PlayerSprite:_2:Subtile
 #2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
 copy: PlayerSprite:_1:Subtile translate:up:4
 
+CrushedPlayerSprite:_0:_BL
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+11334
+11222
+11222
+..111
+..111
+
+CrushedPlayerSprite:_0:_BR
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+43311
+21111
+21111
+111..
+111..
+
+CrushedPlayerSprite:_0:_TL
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+..005
+..005
+11444
+11444
+11334
+
+CrushedPlayerSprite:_0:_TR
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+566..
+566..
+44411
+44411
+43311
+
+CrushedPlayerSprite:_1:Subtile
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: CrushedPlayerSprite:_0:Subtile translate:up:4
+
+CrushedPlayerSprite:_2:Subtile
+#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+copy: CrushedPlayerSprite:_1:Subtile translate:up:4
+
 Jelly1x1Sprite:_0:_BL
 #fbff86 #d5e04b #a2a947 
 11110
@@ -1011,10 +1051,14 @@ WireHigh:right = Wire:right:_1:Subtile
 WireHigh:up = Wire:up:_1:Subtile
 WireHigh:down = Wire:down:_1:Subtile
 
-Sprite:_0 = PlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
-Sprite:_1 = PlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
-Sprite:_2 = PlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
+Sprite:_0 = PlayerSprite:_0:Subtile or CrushedPlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
+Sprite:_1 = PlayerSprite:_1:Subtile or CrushedPlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
+Sprite:_2 = PlayerSprite:_2:Subtile or CrushedPlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
 Sprite = Sprite:_
+
+CrushedPlayerSprite:_0 = CrushedPlayerSprite:_0:Subtile
+CrushedPlayerSprite:_1 = CrushedPlayerSprite:_1:Subtile
+CrushedPlayerSprite:_2 = CrushedPlayerSprite:_2:Subtile
 
 _Jelly2x1:_0 = _Jelly2x1:directions:_0
 _Jelly2x1:_1 = _Jelly2x1:directions:_1
@@ -1264,10 +1308,14 @@ directions [ Lift:_0 _Rising:_0 LiftEdge:directions:_0 ] -> [ Lift:_0 _Rising:_0
 directions [ Lift:_0 _Rising:_0 LiftCorner:directions:_0 ] -> [ Lift:_0 _Rising:_0 LiftCorner:directions:_1 ]
 Subtile [ Lift:_0 _Rising:_0 LiftDeco:_0:Subtile ] -> [ Lift:_1 LiftDeco:_1:Subtile ]
 
-( Process any falling markers from a previous turn )
+( Process any falling markers from a previous turn.
+  If something falls onto the player, they get crushed. )
 directions [ Lift:_1 _Falling:_0 LiftEdge:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftEdge:directions:_0 ]
 directions [ Lift:_1 _Falling:_0 LiftCorner:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftCorner:directions:_0 ]
 Subtile [ Lift:_1 _Falling:_0 LiftDeco:_1:Subtile ] -> [ Lift:_0 LiftDeco:_0:Subtile ]
+
+HighFloor Subtile [ Movable:HighFloor _Falling:HighFloor _Player:Lower _Subtile:Subtile ] -> [ Movable:HighFloor _Falling:HighFloor _Subtile:Subtile CrushedPlayerSprite:Lower:Subtile no _Connector:Lower no _Moving:Lower ]
+_ Subtile [ CrushedPlayerSprite:_ | _Player:_ _Subtile:Subtile ] -> [ CrushedPlayerSprite:_ | _Subtile:Subtile CrushedPlayerSprite:_:Subtile no _Connector:Lower no _Moving:Lower ]
 
 HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:directions:HighFloor no Movable:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _Connector:directions:Lower ]
 + [ Movable:_1 _Falling:_1 _ConnectorHigh:_1 no Movable:_0 ] -> [ Movable:_1 _Falling:_1 _ConnectorHigh:_0 ]
