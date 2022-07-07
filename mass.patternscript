@@ -1139,9 +1139,6 @@ pink
 _Squishing:_
 yellow
 
-_Unprocessed:_
-red
-
 _Processing:_
 green
 
@@ -1169,7 +1166,7 @@ transparent
 _Rising:_
 transparent
 
-_FallingResolved:_
+_FallingMovingResolved:_
 transparent
 
 _MovementTarget:_
@@ -1215,6 +1212,12 @@ _WeightHigh:_
 transparent
 
 _PlayerWeight
+transparent
+
+_FirstTurn
+transparent
+
+_FirstTurnDone
 transparent
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise. )
@@ -1367,14 +1370,13 @@ _BlockedExcept:down:_0 = _Blocked:left:_0 and _Blocked:right:_0 and _Blocked:up:
 _BlockedExcept:down:_1 = _Blocked:left:_1 and _Blocked:right:_1 and _Blocked:up:_1
 _BlockedExcept:down:_2 = _Blocked:left:_2 and _Blocked:right:_2 and _Blocked:up:_2
 
-Status:_0 = _Unprocessed:_0 or _Processing:_0 or _Pending:_0 or _PendingChecking:_0 or _Processed:_0
-Status:_1 = _Unprocessed:_1 or _Processing:_1 or _Pending:_1 or _PendingChecking:_1 or _Processed:_1
-Status:_2 = _Unprocessed:_2 or _Processing:_2 or _Pending:_2 or _PendingChecking:_2 or _Processed:_2
+Status:_0 = _Processing:_0 or _Pending:_0 or _PendingChecking:_0 or _Processed:_0
+Status:_1 = _Processing:_1 or _Pending:_1 or _PendingChecking:_1 or _Processed:_1
+Status:_2 = _Processing:_2 or _Pending:_2 or _PendingChecking:_2 or _Processed:_2
 Status = Status:_
 
 _Pending = _Pending:_
 _PendingNoCycle = _PendingNoCycle:_
-_Unprocessed = _Unprocessed:_
 _Processed = _Processed:_
 
 _PendingChecked:_0 = _PendingCycle:_0 or _PendingNoCycle:_0
@@ -1387,6 +1389,10 @@ MovementMarker:_2 = _MovementTarget:_2 or _MovementConflict:_2
 MovementMarker = MovementMarker:_
 
 _Falling = _Falling:_
+_FallingMovingResolved = _FallingMovingResolved:_
+_FallingResolved:_0 = _FallingMovingResolved:_0 or Floor:_1
+_FallingResolved:_1 = _FallingMovingResolved:_1 or Floor:_2
+_FallingResolved:_2 = _FallingMovingResolved:_2
 _FallingResolved = _FallingResolved:_
 
 _WeightLow = _WeightLow:_
@@ -1395,7 +1401,7 @@ _Weight = _WeightLow or _WeightHigh
 
 _Subtile = _Subtile:Subtile
 
-Player = PlayerSprite:_:_BL
+Player = _Player
 
 =======
 SOUNDS
@@ -1442,7 +1448,7 @@ _ -> _Squishing:_
 _CheckMovement
 _ -> MovementMarker:_
 _ -> _Falling:_, _Rising:_
-_ -> _FallingResolved:_
+_ -> _FallingMovingResolved:_
 _Temp
 _ -> _Temp:_
 _Rerun
@@ -1450,6 +1456,8 @@ _RerunDC
 _RunSecondStep
 _ -> Status:_
 _ -> _PendingChecked:_
+_FirstTurn
+_FirstTurnDone
 _LS:LoopSection
 _, directions -> _Connector:directions:_
 _ConnectorVertical
@@ -1459,89 +1467,84 @@ __Nothing__
 RULES
 ======
 
+random [ ] -> [ _FirstTurn ]
+[ _FirstTurnDone ] [ _FirstTurn ] -> [ _FirstTurnDone ] [ ]
+
 ( Only relevant on level load: fill entire level with subtile markers )
-random [ ] -> [ _Temp ]
+[ _FirstTurn ] -> [ _FirstTurn _Temp ]
 [ _Temp ] [ ] -> [ ] [ _Subtile:_TL ]
-right [ _Subtile:_TL | ] -> [ _Subtile:_TL | _Subtile:_TR ]
-right [ _Subtile:_TR | | ] -> [ _Subtile:_TR | _Subtile:_TL | _Subtile:_TR ]
-down [ _Subtile:_TL | ] -> [ _Subtile:_TL | _Subtile:_BL ]
-down [ _Subtile:_BL | | ] -> [ _Subtile:_BL | _Subtile:_TL | _Subtile:_BL ]
-down [ _Subtile:_TR | ] -> [ _Subtile:_TR | _Subtile:_BR ]
-down [ _Subtile:_BR | | ] -> [ _Subtile:_BR | _Subtile:_TR | _Subtile:_BR ]
+right [ _FirstTurn ] [ _Subtile:_TL | ] -> [ _FirstTurn ] [ _Subtile:_TL | _Subtile:_TR ]
+right [ _FirstTurn ] [ _Subtile:_TR | | ] -> [ _FirstTurn ] [ _Subtile:_TR | _Subtile:_TL | _Subtile:_TR ]
+down [ _FirstTurn ] [ _Subtile:_TL | ] -> [ _FirstTurn ] [ _Subtile:_TL | _Subtile:_BL ]
+down [ _FirstTurn ] [ _Subtile:_BL | | ] -> [ _FirstTurn ] [ _Subtile:_BL | _Subtile:_TL | _Subtile:_BL ]
+down [ _FirstTurn ] [ _Subtile:_TR | ] -> [ _FirstTurn ] [ _Subtile:_TR | _Subtile:_BR ]
+down [ _FirstTurn ] [ _Subtile:_BR | | ] -> [ _FirstTurn ] [ _Subtile:_BR | _Subtile:_TR | _Subtile:_BR ]
 
 ( Cover the bottom two rows with special wall tiles )
-down [ | ] -> [ > Background | ]
-[ stationary Background ] -> [ WallCover ]
+down [ _FirstTurn ] [ | ] -> [ _FirstTurn ] [ > Background | ]
+[ _FirstTurn ] [ stationary Background ] -> [ _FirstTurn ] [ WallCover ]
 
 ( Complete exit sprites )
-LowFloor [ | | Exit:>:LowFloor:_BL ] -> [ ToExit:>:LowFloor:_BL Floor:LowFloor | | Exit:>:LowFloor:_BL ]
-right directions LowFloor [ Exit:directions:LowFloor:_BL | ] -> [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_BR Floor:LowFloor ]
-up directions LowFloor [ Exit:directions:LowFloor:_BL | ] -> [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_TL Floor:LowFloor ]
-up directions LowFloor [ Exit:directions:LowFloor:_BR | ] -> [ Exit:directions:LowFloor:_BR | Exit:directions:LowFloor:_TR Floor:LowFloor ]
-right directions LowFloor [ ToExit:directions:LowFloor:_BL | ] -> [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_BR Floor:LowFloor ]
-up directions LowFloor [ ToExit:directions:LowFloor:_BL | ] -> [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_TL Floor:LowFloor ]
-up directions LowFloor [ ToExit:directions:LowFloor:_BR | ] -> [ ToExit:directions:LowFloor:_BR | ToExit:directions:LowFloor:_TR Floor:LowFloor ]
-LowFloor Subtile [ Wall | no Wall | ToExit:^:LowFloor:Subtile ] -> [ Wall WallToExit:^:Subtile | | ToExit:^:LowFloor:Subtile ]
-LowFloor Subtile [ ToExit:^:LowFloor:Subtile | no Wall | Wall ] -> [ ToExit:^:LowFloor:Subtile | | Wall WallToExit:^:Subtile ]
-LowFloor Subtile [ Wall | no Wall | Exit:^:LowFloor:Subtile ] -> [ Wall WallExit:^:Subtile | | Exit:^:LowFloor:Subtile ]
-LowFloor Subtile [ Exit:^:LowFloor:Subtile | no Wall | Wall ] -> [ Exit:^:LowFloor:Subtile | | Wall WallExit:^:Subtile ]
-up [ Exit:up:LowFloor:Subtile | | ] -> [ Exit:up:LowFloor:Subtile | | WallCover ]
-[ Exit:down:LowFloor:Subtile WallCover ] -> [ Exit:down:LowFloor:Subtile ]
+LowFloor [ _FirstTurn ] [ | | Exit:>:LowFloor:_BL ] -> [ _FirstTurn ] [ ToExit:>:LowFloor:_BL Floor:LowFloor | | Exit:>:LowFloor:_BL ]
+right directions LowFloor [ _FirstTurn ] [ Exit:directions:LowFloor:_BL | ] -> [ _FirstTurn ] [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ Exit:directions:LowFloor:_BL | ] -> [ _FirstTurn ] [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ Exit:directions:LowFloor:_BR | ] -> [ _FirstTurn ] [ Exit:directions:LowFloor:_BR | Exit:directions:LowFloor:_TR Floor:LowFloor ]
+right directions LowFloor [ _FirstTurn ] [ ToExit:directions:LowFloor:_BL | ] -> [ _FirstTurn ] [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ ToExit:directions:LowFloor:_BL | ] -> [ _FirstTurn ] [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ ToExit:directions:LowFloor:_BR | ] -> [ _FirstTurn ] [ ToExit:directions:LowFloor:_BR | ToExit:directions:LowFloor:_TR Floor:LowFloor ]
+LowFloor Subtile [ _FirstTurn ] [ Wall | no Wall | ToExit:^:LowFloor:Subtile ] -> [ _FirstTurn ] [ Wall WallToExit:^:Subtile | | ToExit:^:LowFloor:Subtile ]
+LowFloor Subtile [ _FirstTurn ] [ ToExit:^:LowFloor:Subtile | no Wall | Wall ] -> [ _FirstTurn ] [ ToExit:^:LowFloor:Subtile | | Wall WallToExit:^:Subtile ]
+LowFloor Subtile [ _FirstTurn ] [ Wall | no Wall | Exit:^:LowFloor:Subtile ] -> [ _FirstTurn ] [ Wall WallExit:^:Subtile | | Exit:^:LowFloor:Subtile ]
+LowFloor Subtile [ _FirstTurn ] [ Exit:^:LowFloor:Subtile | no Wall | Wall ] -> [ _FirstTurn ] [ Exit:^:LowFloor:Subtile | | Wall WallExit:^:Subtile ]
+up [ _FirstTurn ] [ Exit:up:LowFloor:Subtile | | ] -> [ _FirstTurn ] [ Exit:up:LowFloor:Subtile | | WallCover ]
+[ _FirstTurn ] [ Exit:down:LowFloor:Subtile WallCover ] -> [ _FirstTurn ] [ Exit:down:LowFloor:Subtile ]
 
 ( Decorate floor tiles )
-_ Subtile [ Floor:_ _Subtile:Subtile ] -> [ Floor:_ _Subtile:Subtile FloorDeco:_:Subtile ]
+_ Subtile [ _FirstTurn ] [ Floor:_ _Subtile:Subtile ] -> [ _FirstTurn ] [ Floor:_ _Subtile:Subtile FloorDeco:_:Subtile ]
 
 ( Decorate the edges of higher floors )
-[ Floor:_1 | no Floor:_1 no Wall ] -> [ Floor:_1 FloorEdge:> | ]
-[ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
+[ _FirstTurn ] [ Floor:_1 | no Floor:_1 no Wall ] -> [ _FirstTurn ] [ Floor:_1 FloorEdge:> | ]
+[ _FirstTurn ] [ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ _FirstTurn ] [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
+[ _FirstTurn ] [ Floor:_1 no FloorEdge:v | Floor:_1 FloorEdge:v ] -> [ _FirstTurn ] [ Floor:_1 FloorCorner:v | Floor:_1 FloorEdge:v ]
 
 ( Decorate lifts )
-LowFloor Subtile [ Lift:LowFloor _Subtile:Subtile ] -> [ Lift:LowFloor _Subtile:Subtile LiftDeco:LowFloor:Subtile ]
-LowFloor [ Lift:LowFloor | no Lift:LowFloor ] -> [ Lift:LowFloor LiftEdge:>:LowFloor | ]
-LowFloor LiftGroup [ Lift:LowFloor _LiftGroup:LiftGroup | Lift:LowFloor no _LiftGroup:LiftGroup ] -> [ Lift:LowFloor _LiftGroup:LiftGroup LiftEdge:>:LowFloor | Lift:LowFloor ]
-LowFloor [ Lift:LowFloor no LiftEdge:^:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ] -> [ Lift:LowFloor LiftCorner:>:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ]
-
-( Decorate the edges of higher floors )
-[ Floor:_1 | no Floor:_1 no Wall ] -> [ Floor:_1 FloorEdge:> | ]
-[ Floor:_1 no FloorEdge:^ | Floor:_1 FloorEdge:^ ] -> [ Floor:_1 FloorCorner:> | Floor:_1 FloorEdge:^ ]
-[ Floor:_1 no FloorEdge:v | Floor:_1 FloorEdge:v ] -> [ Floor:_1 FloorCorner:v | Floor:_1 FloorEdge:v ]
+LowFloor Subtile [ _FirstTurn ] [ Lift:LowFloor _Subtile:Subtile ] -> [ _FirstTurn ] [ Lift:LowFloor _Subtile:Subtile LiftDeco:LowFloor:Subtile ]
+LowFloor [ _FirstTurn ] [ Lift:LowFloor | no Lift:LowFloor ] -> [ _FirstTurn ] [ Lift:LowFloor LiftEdge:>:LowFloor | ]
+LowFloor LiftGroup [ _FirstTurn ] [ Lift:LowFloor _LiftGroup:LiftGroup | Lift:LowFloor no _LiftGroup:LiftGroup ] -> [ _FirstTurn ] [ Lift:LowFloor _LiftGroup:LiftGroup LiftEdge:>:LowFloor | Lift:LowFloor ]
+LowFloor [ _FirstTurn ] [ Lift:LowFloor no LiftEdge:^:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ] -> [ _FirstTurn ] [ Lift:LowFloor LiftCorner:>:LowFloor | Lift:LowFloor LiftEdge:^:LowFloor ]
 
 ( Decorate the edges of walls )
-Subtile [ Wall _Subtile:Subtile | no Wall ] -> [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
-[ Wall no WallEdge:^ | Wall WallEdge:^ ] -> [ Wall WallCorner:> | Wall WallEdge:^ ]
+Subtile [ _FirstTurn ] [ Wall _Subtile:Subtile | no Wall ] -> [ _FirstTurn ] [ Wall WallEdge:> WallEdgeDark:>:Subtile _Subtile:Subtile | ]
+[ _FirstTurn ] [ Wall no WallEdge:^ | Wall WallEdge:^ ] -> [ _FirstTurn ] [ Wall WallCorner:> | Wall WallEdge:^ ]
 
 ( Complete wires with remaining subtiles )
-right directions LowFloor [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_BR Floor:LowFloor ]
-up directions LowFloor [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_TL Floor:LowFloor ]
-up directions LowFloor [ Wire:directions:LowFloor:_BR | Floor:LowFloor ] -> [ Wire:directions:LowFloor:_BR | Wire:directions:LowFloor:_TR Floor:LowFloor ]
-directions Subtile [ FloorEdge:directions WireHigh:directions _Subtile:Subtile ] -> [ FloorEdge:directions WireHigh:directions _Subtile:Subtile WireEdge:directions:Subtile ]
-
-( Clean up )
-( TODO: this is probably unnecessary )
-[ _Connector ] -> [ ]
-[ ObjectType ] -> [ ]
+right directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BR | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BR | Wire:directions:LowFloor:_TR Floor:LowFloor ]
+directions Subtile [ _FirstTurn ] [ FloorEdge:directions WireHigh:directions _Subtile:Subtile ] -> [ _FirstTurn ] [ FloorEdge:directions WireHigh:directions _Subtile:Subtile WireEdge:directions:Subtile ]
 
 ( Expand player. We're handling movement manually, so we replace the movement input with a marker object. )
-_ [ > PlayerSprite:_:_BL ] -> [ _Player:_ _Moving:>:_ _Connector:right:_ _Connector:up:_ ]
-_ [ PlayerSprite:_:_BL ] -> [ _Player:_ _Connector:right:_ _Connector:up:_ ]
-_ [ _Player:_ _Connector:>:_ _Connector:^:_ | no _Player:_ ] -> [ _Player:_ _Connector:>:_ _Connector:^:_ | _Player:_ _Connector:<:_ _Connector:^:_ ]
-_ [ _Player:_ _Moving:_ ] [ _Player:_ ] -> [ _Player:_ _Moving:_ _Processing:_ ] [ _Player:_ _Moving:_ _Processing:_ ]
+_ [ _FirstTurn ] [ PlayerSprite:_:_BL ] -> [ _FirstTurn ] [ _Player:_ _Connector:right:_ _Connector:up:_ ]
+_ [ _FirstTurn ] [ _Player:_ _Connector:>:_ _Connector:^:_ | no _Player:_ ] -> [ _FirstTurn ] [ _Player:_ _Connector:>:_ _Connector:^:_ | _Player:_ _Connector:<:_ _Connector:^:_ ]
 
 ( Expand 1x1 jellies )
-_ [ Jelly1x1Sprite:_:_BL ] -> [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ]
-_ [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | ] -> [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | _Jelly1x1:_ _Connector:<:_ _Connector:^:_ ]
+_ [ _FirstTurn ] [ Jelly1x1Sprite:_:_BL ] -> [ _FirstTurn ] [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ ]
+_ [ _FirstTurn ] [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | ] -> [ _FirstTurn ] [ _Jelly1x1:_ _Connector:>:_ _Connector:^:_ | _Jelly1x1:_ _Connector:<:_ _Connector:^:_ ]
 
 ( Expand tall 1x1 jellies )
-LowFloor [ Jelly1x1TallSprite:LowFloor:_BL ] -> [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
-LowFloor [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | ] -> [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:<:LowFloor _Connector:^:LowFloor _Connector:<:Higher _Connector:^:Higher _ConnectorVertical:LowFloor ]
+LowFloor [ _FirstTurn ] [ Jelly1x1TallSprite:LowFloor:_BL ] -> [ _FirstTurn ] [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _Connector:right:Higher _Connector:up:Higher _ConnectorHigh:LowFloor ]
+LowFloor [ _FirstTurn ] [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | ] -> [ _FirstTurn ] [ _Jelly1x1TallLow:LowFloor _Connector:>:LowFloor _Connector:^:LowFloor _ConnectorVertical:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:<:LowFloor _Connector:^:LowFloor _Connector:<:Higher _Connector:^:Higher _ConnectorVertical:LowFloor ]
 
 ( Expand 2x1 jellies )
-_ Axes [ Jelly2x1Sprite:Axes:_:_BL ] -> [ _Jelly2x1:Axes:_ _Connector:right:_ _Connector:up:_ ]
-_ [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | ] -> [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:perpendicular:_ _Connector:<:_ _Connector:perpendicular:_ ]
-_ [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -> [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:<:_ _Connector:perpendicular:_ ]
-[ _Temp:_ ] -> [ ]
+_ Axes [ _FirstTurn ] [ Jelly2x1Sprite:Axes:_:_BL ] -> [ _FirstTurn ] [ _Jelly2x1:Axes:_ _Connector:right:_ _Connector:up:_ ]
+_ [ _FirstTurn ] [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | ] -> [ _FirstTurn ] [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:perpendicular:_ _Connector:<:_ _Connector:perpendicular:_ ]
+_ [ _FirstTurn ] [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -> [ _FirstTurn ] [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:<:_ _Connector:perpendicular:_ ]
+[ _FirstTurn ] [ _Temp:_ ] -> [ _FirstTurn ] [ ]
 
+( Clean up sprites )
 [ Sprite ] -> [ ]
+
+((( Process again turns )))
 
 ( If the level is completed, remove the player and trigger the win condition )
 LowFloor [ _Player:LowFloor Exit:directions:LowFloor:Subtile ] -> [ Exit:directions:LowFloor:Subtile no _Connector ] win
@@ -1582,7 +1585,8 @@ HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:direction
 + [ _Jelly1x1TallHigh:_2 _Falling:_2 no Movable:_1 no _Connector:_2 ] -> [ _Jelly1x1TallHigh:_1 ]
 
 ((( Process player and jelly movement )))
-_ [ Movable:_ no Status:_ ] -> [ Movable:_ _Unprocessed:_ ]
+
+_ [ > _Player:_ ] -> [ _Player:_ _Moving:>:_ _Processing:_ ]
 
 ( Can't nest loops in PS, so we have to put everything in a single loop and group things manually )
 random [ ] -> [ _Temp ]
@@ -1735,7 +1739,6 @@ startloop
   ((( CLeanup and check if we should run another step )))
   
   [ _LS:CS ] [ _Blocked ] -> [ _LS:CS ] [ ]
-  [ _LS:CS ] [ _Unprocessed ] -> [ _LS:CS ] [ ]
   [ _LS:CS ] [ _Processed ] -> [ _LS:CS ] [ ]
   
   [ _LS:CS no _RunSecondStep ] -> [ ]
@@ -1746,24 +1749,23 @@ endloop
 
 ((( Drop unsupported objects )))
 
-( Floors can't fall... )
-HighFloor [ Floor:HighFloor ] -> [ Floor:HighFloor _FallingResolved:Lower]
-( Neither can objects on the ground floor. )
-[ Movable:_0 ] -> [ Movable:_0 _FallingResolved:_0 ]
+( Objects on the ground floor can't fall. )
+[ Movable:_0 ] -> [ Movable:_0 _FallingMovingResolved:_0 ]
 
 ( We need to run this in a loop because once an object is marked as falling, it might allow
   an object on top to fall as well )
 startloop
   ( Objects above falling objects and objects without support can fall )
-  HighFloor [ Movable:HighFloor no _FallingResolved:HighFloor _FallingResolved:Lower _Falling:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _FallingResolved:Lower _Falling:Lower ]
-  HighFloor [ Movable:HighFloor no _FallingResolved:HighFloor no Support:HighFloor ] -> [ Movable:HighFloor _Falling:HighFloor _FallingResolved:HighFloor ]
-  HighFloor [ Movable:HighFloor no _FallingResolved:HighFloor Support:HighFloor _FallingResolved:Lower no _Falling:Lower ] -> [ Movable:HighFloor _FallingResolved:HighFloor Support:HighFloor _FallingResolved:Lower ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor _FallingResolved:Lower _Falling:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _FallingMovingResolved:Lower _Falling:Lower ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor no Support:HighFloor ] -> [ Movable:HighFloor _Falling:HighFloor _FallingMovingResolved:HighFloor ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor Support:HighFloor _FallingResolved:Lower no _Falling:Lower ] -> [ Movable:HighFloor _FallingMovingResolved:HighFloor Support:HighFloor _FallingResolved:Lower ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor Floor:HighFloor no _Falling:Lower ] -> [ Movable:HighFloor _FallingMovingResolved:HighFloor Floor:HighFloor ]
   
   ( Objects that aren't completely marked as falling get reverted because they have some support )
-  _ [ Movable:_ no _Falling:_ _FallingResolved:_ _Connector:>:_ | _Falling:_ ] -> [ Movable:_ _Connector:>:_ _FallingResolved:_ | _FallingResolved:_ ]
+  _ [ Movable:_ no _Falling:_ _FallingMovingResolved:_ _Connector:>:_ | _Falling:_ ] -> [ Movable:_ _Connector:>:_ _FallingMovingResolved:_ | _FallingMovingResolved:_ ]
   
   ( Spread falling status upward in tall jellies if they're still falling )
-  LowFloor [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingResolved:LowFloor _ConnectorHigh:LowFloor no _Falling:Higher no _FallingResolved:Higher ] -> [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingResolved:LowFloor _ConnectorHigh:LowFloor _Falling:Higher _FallingResolved:Higher ]
+  LowFloor [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingMovingResolved:LowFloor _ConnectorHigh:LowFloor no _Falling:Higher no _FallingMovingResolved:Higher ] -> [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingMovingResolved:LowFloor _ConnectorHigh:LowFloor _Falling:Higher _FallingMovingResolved:Higher ]
 endloop
 
 ((( Process lifts )))
@@ -1844,26 +1846,28 @@ _ [ Movable:_ _Connector:>:_ _Processing:_ no _Falling:_ | _Falling:_ ] -> [ Mov
 ( If anything is still falling or raising, we resolve that in an again turn. Don't need to check _Rising
   because nothing can be raised without something falling. )
 [ _Falling ] -> again
-[ _FallingResolved ] -> [ ]
+[ _FallingMovingResolved ] -> [ ]
 
 ( If the player is on an exit, trigger an again turn to process the win condition. )
 LowFloor [ _Player:LowFloor Exit:directions:LowFloor:Subtile ] -> again
 
 ( Render sprites again )
-right _ [ _Player:_ _Connector:right:_ _Connector:up:_ | ] -> [ PlayerSprite:_:_BL _Connector:right:_ _Connector:up:_ | PlayerSprite:_:_BR ]
-right _ [ _Player:_ _Connector:right:_ _Connector:down:_ | ] -> [ PlayerSprite:_:_TL _Connector:right:_ _Connector:down:_ | PlayerSprite:_:_TR ]
+right _ [ _Player:_ _Connector:right:_ _Connector:up:_ | ] -> [ PlayerSprite:_:_BL _Player:_ _Connector:right:_ _Connector:up:_ | PlayerSprite:_:_BR ]
+right _ [ _Player:_ _Connector:right:_ _Connector:down:_ | ] -> [ PlayerSprite:_:_TL _Player:_ _Connector:right:_ _Connector:down:_ | PlayerSprite:_:_TR ]
 
-right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | ] -> [ Jelly1x1Sprite:_:_BL _Connector:right:_ _Connector:up:_ | Jelly1x1Sprite:_:_BR ]
-right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | ] -> [ Jelly1x1Sprite:_:_TL _Connector:right:_ _Connector:down:_ | Jelly1x1Sprite:_:_TR ]
+right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | ] -> [ Jelly1x1Sprite:_:_BL _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | Jelly1x1Sprite:_:_BR ]
+right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | ] -> [ Jelly1x1Sprite:_:_TL _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | Jelly1x1Sprite:_:_TR ]
 
-right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_BL _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_BR ]
-right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_TL _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_TR ]
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_BL _Jelly1x1TallLow:LowFloor _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_BR ]
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_TL _Jelly1x1TallLow:LowFloor _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_TR ]
 
-right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:up:_ | | | ] -> [ Jelly2x1Sprite:right:_:_BL _Connector:right:_ _Connector:up:_ | Jelly2x1Sprite:right:_:_BR | Jelly2x1Sprite:left:_:_BL | Jelly2x1Sprite:left:_:_BR ]
-right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:down:_ | | | ] -> [ Jelly2x1Sprite:right:_:_TL _Connector:right:_ _Connector:down:_ | Jelly2x1Sprite:right:_:_TR | Jelly2x1Sprite:left:_:_TL | Jelly2x1Sprite:left:_:_TR ]
+right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:up:_ | | | ] -> [ Jelly2x1Sprite:right:_:_BL _Jelly2x1:right:_ _Connector:right:_ _Connector:up:_ | Jelly2x1Sprite:right:_:_BR | Jelly2x1Sprite:left:_:_BL | Jelly2x1Sprite:left:_:_BR ]
+right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:down:_ | | | ] -> [ Jelly2x1Sprite:right:_:_TL _Jelly2x1:right:_ _Connector:right:_ _Connector:down:_ | Jelly2x1Sprite:right:_:_TR | Jelly2x1Sprite:left:_:_TL | Jelly2x1Sprite:left:_:_TR ]
 
-up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:right:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BL _Connector:up:_ _Connector:right:_ | Jelly2x1Sprite:up:_:_TL | Jelly2x1Sprite:down:_:_BL | Jelly2x1Sprite:down:_:_TL ]
-up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:left:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BR _Connector:up:_ _Connector:left:_ | Jelly2x1Sprite:up:_:_TR | Jelly2x1Sprite:down:_:_BR | Jelly2x1Sprite:down:_:_TR ]
+up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:right:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BL _Jelly2x1:up:_ _Connector:up:_ _Connector:right:_ | Jelly2x1Sprite:up:_:_TL | Jelly2x1Sprite:down:_:_BL | Jelly2x1Sprite:down:_:_TL ]
+up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:left:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BR _Jelly2x1:up:_ _Connector:up:_ _Connector:left:_ | Jelly2x1Sprite:up:_:_TR | Jelly2x1Sprite:down:_:_BR | Jelly2x1Sprite:down:_:_TR ]
+
+[ _FirstTurn ] -> [ _FirstTurnDone ]
 
 ==============
 WINCONDITIONS
