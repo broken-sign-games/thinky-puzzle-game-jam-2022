@@ -49,17 +49,17 @@ _0 _1 -> _1 _2
 HighFloor => Lower
 _1 _2 -> _0 _1
 
-Subtile => OffsetBL
-_BL _BR _TL _TR -> _BL _BR _TL _TR
-
-Subtile => OffsetBR
+Subtile => HReflect
 _BL _BR _TL _TR -> _BR _BL _TR _TL
 
-Subtile => OffsetTL
+Subtile => VReflect
 _BL _BR _TL _TR -> _TL _TR _BL _BR
 
-Subtile => OffsetTR
-_BL _BR _TL _TR -> _TR _TL _BR _BL
+Subtile => LRot
+_BL _BR _TL _TR -> _BR _TR _BL _TL
+
+Subtile => RRot
+_BL _BR _TL _TR -> _TL _BL _TR _BR
 
 ========
 OBJECTS
@@ -156,6 +156,9 @@ WallCover
 00000
 00000
 00000
+00000
+00000
+00000
 
 WallEdgeDark:directions:Subtile
 transparent
@@ -230,6 +233,224 @@ WallCorner:directions
 0011.
 0011.
 rot:left:> translate:up:8
+
+ToExit:right:_0:_TL
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+..112
+..112
+..112
+..112
+..112
+
+ToExit:right:_0:_TR
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+23344
+23344
+23344
+23344
+23344
+
+ToExit:right:_0:_BL
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:right:_0:_TL -
+
+ToExit:right:_0:_BR
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:right:_0:_TR -
+
+Exit:right:_0:_TL
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+44445
+44445
+44444
+44444
+44444
+
+Exit:right:_0:_TR
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+55555
+55555
+45555
+45555
+45555
+
+Exit:right:_0:_BL
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:right:_0:_TL -
+
+Exit:right:_0:_BR
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:right:_0:_TR -
+
+ToExit:left:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:right:_0:HReflect |
+
+Exit:left:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:right:_0:HReflect |
+
+ToExit:up:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:right:_0:RRot rot:right:up
+
+Exit:up:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:right:_0:RRot rot:right:up
+
+ToExit:down:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:up:_0:VReflect -
+
+Exit:down:_0:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:up:_0:VReflect -
+
+ToExit:directions:_1:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff
+copy: ToExit:directions:_0:Subtile translate:up:4
+
+Exit:directions:_1:Subtile
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:directions:_0:Subtile translate:up:4
+
+Exit:down:_1:_BL
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+55444
+55555
+55555
+55555
+55555
+55555
+55555
+55555
+55555
+
+Exit:down:_1:_BR
+#484a77 #4d65b4 #4d9be6 #8fd3ff #ffffff #313638
+copy: Exit:down:_1:_BL |
+
+WallToExit:directions:Subtile
+transparent
+
+WallExit:directions:Subtile
+transparent
+
+WallToExit:right:_BL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+33445
+33445
+33445
+33445
+33445
+33445
+33445
+33445
+
+WallToExit:right:_BR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+56677
+56677
+56677
+56677
+56677
+56677
+56677
+56677
+
+WallExit:right:_BL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+22222
+77222
+77222
+77222
+77222
+77222
+77222
+
+WallExit:right:_BR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+
+WallExit:up:_BR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+translate:up:8
+
+WallExit:up:_TR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+22222
+22222
+translate:up:8
+
+WallExit:up:_BL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallExit:up:_BR |
+
+WallExit:up:_TL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallExit:up:_TR |
+
+WallExit:down:_BR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+translate:up:8
+
+WallExit:down:_TR
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+22222
+22222
+22222
+22222
+22222
+translate:up:8
+
+WallExit:down:_BL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallExit:down:_BR |
+
+WallExit:down:_TL
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallExit:down:_TR |
+
+WallToExit:left:Subtile
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallToExit:right:HReflect |
+
+WallExit:left:Subtile
+#0b8a8f #374e4a #313638 #323353 #484a77 #4d65b4 #4d9be6 #8fd3ff 
+copy: WallExit:right:HReflect |
 
 Lift:_0 
 #6b3e75
@@ -975,6 +1196,9 @@ pink
 _Vacated:_
 pink
 
+_Win
+transparent
+
 _LiftGroup:LiftGroup
 transparent
 
@@ -1041,6 +1265,14 @@ P = PlayerSprite:_0:_BL and Floor:_0
 ╗ = Wire:left:_1:_BL and Wire:down:_1:_BL and Floor:_1
 ╚ = Wire:up:_1:_BL and Wire:right:_1:_BL and Floor:_1
 ╝ = Wire:left:_1:_BL and Wire:up:_1:_BL and Floor:_1
+U = Exit:up:_0:_BL and Floor:_0
+D = Exit:down:_0:_BL and Floor:_0
+L = Exit:left:_0:_BL and Floor:_0
+R = Exit:right:_0:_BL and Floor:_0
+Ụ = Exit:up:_1:_BL and Floor:_1
+Ḍ = Exit:down:_1:_BL and Floor:_1
+Ḷ = Exit:left:_1:_BL and Floor:_1
+Ṛ = Exit:right:_1:_BL and Floor:_1
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -1188,10 +1420,12 @@ Lift:LowFloor
 LiftDeco:LowFloor:Subtile
 directions -> LiftEdge:directions:LowFloor
 directions -> LiftCorner:directions:LowFloor
+ToExit:directions:LowFloor:Subtile, Exit:directions:LowFloor:Subtile
 _ -> Sprite:_
 directions -> WallEdgeDark:directions:Subtile
 directions -> WallEdge:directions
 directions -> WallCorner:directions
+WallToExit:directions:Subtile, WallExit:directions:Subtile
 WallCover
 
 --
@@ -1238,6 +1472,21 @@ down [ _Subtile:_BR | | ] -> [ _Subtile:_BR | _Subtile:_TR | _Subtile:_BR ]
 ( Cover the bottom two rows with special wall tiles )
 down [ | ] -> [ > Background | ]
 [ stationary Background ] -> [ WallCover ]
+
+( Complete exit sprites )
+LowFloor [ | | Exit:>:LowFloor:_BL ] -> [ ToExit:>:LowFloor:_BL Floor:LowFloor | | Exit:>:LowFloor:_BL ]
+right directions LowFloor [ Exit:directions:LowFloor:_BL | ] -> [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ Exit:directions:LowFloor:_BL | ] -> [ Exit:directions:LowFloor:_BL | Exit:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ Exit:directions:LowFloor:_BR | ] -> [ Exit:directions:LowFloor:_BR | Exit:directions:LowFloor:_TR Floor:LowFloor ]
+right directions LowFloor [ ToExit:directions:LowFloor:_BL | ] -> [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_BR Floor:LowFloor ]
+up directions LowFloor [ ToExit:directions:LowFloor:_BL | ] -> [ ToExit:directions:LowFloor:_BL | ToExit:directions:LowFloor:_TL Floor:LowFloor ]
+up directions LowFloor [ ToExit:directions:LowFloor:_BR | ] -> [ ToExit:directions:LowFloor:_BR | ToExit:directions:LowFloor:_TR Floor:LowFloor ]
+LowFloor Subtile [ Wall | no Wall | ToExit:^:LowFloor:Subtile ] -> [ Wall WallToExit:^:Subtile | | ToExit:^:LowFloor:Subtile ]
+LowFloor Subtile [ ToExit:^:LowFloor:Subtile | no Wall | Wall ] -> [ ToExit:^:LowFloor:Subtile | | Wall WallToExit:^:Subtile ]
+LowFloor Subtile [ Wall | no Wall | Exit:^:LowFloor:Subtile ] -> [ Wall WallExit:^:Subtile | | Exit:^:LowFloor:Subtile ]
+LowFloor Subtile [ Exit:^:LowFloor:Subtile | no Wall | Wall ] -> [ Exit:^:LowFloor:Subtile | | Wall WallExit:^:Subtile ]
+up [ Exit:up:LowFloor:Subtile | | ] -> [ Exit:up:LowFloor:Subtile | | WallCover ]
+[ Exit:down:LowFloor:Subtile WallCover ] -> [ Exit:down:LowFloor:Subtile ]
 
 ( Decorate floor tiles )
 _ Subtile [ Floor:_ _Subtile:Subtile ] -> [ Floor:_ _Subtile:Subtile FloorDeco:_:Subtile ]
@@ -1293,6 +1542,9 @@ _ [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -
 [ _Temp:_ ] -> [ ]
 
 [ Sprite ] -> [ ]
+
+( If the level is completed, remove the player and trigger the win condition )
+LowFloor [ _Player:LowFloor Exit:directions:LowFloor:Subtile ] -> [ Exit:directions:LowFloor:Subtile no _Connector ] win
 
 ( Process any rising markers from a previous turn )
 
@@ -1590,6 +1842,9 @@ _ [ Movable:_ _Connector:>:_ _Processing:_ no _Falling:_ | _Falling:_ ] -> [ Mov
 [ _Falling ] -> again
 [ _FallingResolved ] -> [ ]
 
+( If the player is on an exit, trigger an again turn to process the win condition. )
+LowFloor [ _Player:LowFloor Exit:directions:LowFloor:Subtile ] -> again
+
 ( Render sprites again )
 right _ [ _Player:_ _Connector:right:_ _Connector:up:_ | ] -> [ PlayerSprite:_:_BL _Connector:right:_ _Connector:up:_ | PlayerSprite:_:_BR ]
 right _ [ _Player:_ _Connector:right:_ _Connector:down:_ | ] -> [ PlayerSprite:_:_TL _Connector:right:_ _Connector:down:_ | PlayerSprite:_:_TR ]
@@ -1646,6 +1901,14 @@ P = PlayerSprite:_0 and Floor:_0
 ╗ = Wire:left:_1 and Wire:down:_1 and Floor:_1
 ╚ = Wire:up:_1 and Wire:right:_1 and Floor:_1
 ╝ = Wire:left:_1 and Wire:up:_1 and Floor:_1
+U = Exit:up:_0:_BL and Floor:_0
+D = Exit:down:_0:_BL and Floor:_0
+L = Exit:left:_0:_BL and Floor:_0
+R = Exit:right:_0:_BL and Floor:_0
+Ụ = Exit:up:_1:_BL and Floor:_1
+Ḍ = Exit:down:_1:_BL and Floor:_1
+Ḷ = Exit:left:_1:_BL and Floor:_1
+Ṛ = Exit:right:_1:_BL and Floor:_1
 )
 
 ################## 
@@ -1721,49 +1984,51 @@ P = PlayerSprite:_0 and Floor:_0
 ##########################
 ##########################
 
-##########################
-##########################
-##########################
-##########################
-##########################
-##########################
-##**************##########
-##**************##########
-##**************1111....##
-##**************1111....##
-##**************1111....##
-##****‼***▐*****1111....##
-##**************........##
-##**************........##
-##**************¹¹¹¹....##
-##****□***▀*****¹¹¹¹....##
-##**************¹¹¹¹....##
-##ℙ*************¹¹¹¹....##
-##************############
-##************############
-##########################
-##########################
+############**##############
+############**##############
+############**##############
+############Ụ*##############
+############**##############
+############**##############
+####**************##########
+####**************##########
+####**************1111....##
+####**************1111....##
+####**************1111....##
+####****‼***▐*****1111....##
+####**************........##
+####**************........##
+******************¹¹¹¹....##
+Ḷ*******□***▀*****¹¹¹¹....##
+####**************¹¹¹¹..####
+####ℙ*************¹¹¹¹..####
+####************######******
+####************######****Ṛ*
+##########**################
+##########**################
+##########**################
+##########Ḍ*################
 
 ( TODO: place the exit such that you can't just build a bridge to it. )
-######################################
-######################################
-######################################
-######################################
-##**************######################
-##**************######################
-##****##************************¹¹####
-##****##************************¹¹####
-##********************..........│.####
-##**********▀*********..........│.####
-##**##**************************║*####
-##**##**ℙ*******▐*******╔═══════╝*####
-##********************..11........####
-##**********▐*▀*******..11........####
-##****##**************............####
-##****##**************........■...####
-##**************####**............####
-##**************####**............####
-####################************..**##
-####################************..**##
-######################################
-######################################
+########################################
+########################################
+########################################
+########################################
+##**************########################
+##**************########################
+##****##************************¹¹######
+##****##************************¹¹######
+##********************..........│.######
+##**********▀*********..........│.######
+##**##**************************║*######
+##**##**ℙ*******▐*******╔═══════╝*######
+##********************..11........######
+##**********▐*▀*******..11........######
+##****##**************............######
+##****##**************........■...######
+##**************####**............######
+##**************####**............######
+####################************..******
+####################************..****Ṛ*
+########################################
+########################################
