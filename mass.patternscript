@@ -1277,7 +1277,8 @@ R = Exit:right:_0:_BL and Floor:_0
 Ḷ = Exit:left:_1:_BL and Floor:_1
 Ṛ = Exit:right:_1:_BL and Floor:_1
 
-a = PlayerSprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL and Floor:_1
+a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -1917,8 +1918,24 @@ R = Exit:right:_0:_BL and Floor:_0
 Ḷ = Exit:left:_1:_BL and Floor:_1
 Ṛ = Exit:right:_1:_BL and Floor:_1
 
-a = PlayerSprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL and Floor:_1
+a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 )
+
+level Moat
+
+########################
+########################
+########################
+########################
+##..**********....**####
+##..**********....**####
+##11**********¹¹¹¹******
+##11══a═══b═══¹¹¹¹****ṛ*
+##..**********....**####
+##..**********....**####
+########################
+########################
 
 level Skinner Box
 
