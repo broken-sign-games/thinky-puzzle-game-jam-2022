@@ -1546,7 +1546,11 @@ _ [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -
 ( If the level is completed, remove the player and trigger the win condition )
 LowFloor [ _Player:LowFloor Exit:directions:LowFloor:Subtile ] -> [ Exit:directions:LowFloor:Subtile no _Connector ] win
 
-( Process any rising markers from a previous turn )
+( Process any rising markers from a previous turn.
+  If the player rises into a static jelly, they get crushed. )
+
+Subtile [ _Player:_0 _Rising:_1 _Jelly:_1 no _Rising:_2 _Subtile:Subtile ] -> [ _Jelly:_1 _Subtile:Subtile CrushedPlayerSprite:_1:Subtile no _Connector:_0 no _Moving:_0 ]
+Subtile [ CrushedPlayerSprite:_1 | _Player:_0 _Subtile:Subtile ] -> [ CrushedPlayerSprite:_1 | _Subtile:Subtile CrushedPlayerSprite:_1:Subtile no _Connector:_0 no _Moving:_0 ]
 
 LowFloor directions [ Movable:LowFloor _Rising:Higher _Connector:directions:LowFloor no Movable:Higher ] -> [ Movable:LowFloor _Rising:Higher _Connector:directions:Higher ]
 + [ Movable:_0 _Rising:_1 _ConnectorHigh:_0 no Movable:_1 ] -> [ Movable:_0 _Rising:_1 _ConnectorHigh:_1 ]
@@ -1561,12 +1565,12 @@ directions [ Lift:_0 _Rising:_0 LiftCorner:directions:_0 ] -> [ Lift:_0 _Rising:
 Subtile [ Lift:_0 _Rising:_0 LiftDeco:_0:Subtile ] -> [ Lift:_1 LiftDeco:_1:Subtile ]
 
 ( Process any falling markers from a previous turn.
-  If something falls onto the player, they get crushed. )
+  If something falls onto the static player, they get crushed. )
 directions [ Lift:_1 _Falling:_0 LiftEdge:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftEdge:directions:_0 ]
 directions [ Lift:_1 _Falling:_0 LiftCorner:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftCorner:directions:_0 ]
 Subtile [ Lift:_1 _Falling:_0 LiftDeco:_1:Subtile ] -> [ Lift:_0 LiftDeco:_0:Subtile ]
 
-HighFloor Subtile [ Movable:HighFloor _Falling:HighFloor _Player:Lower _Subtile:Subtile ] -> [ Movable:HighFloor _Falling:HighFloor _Subtile:Subtile CrushedPlayerSprite:Lower:Subtile no _Connector:Lower no _Moving:Lower ]
+HighFloor Subtile [ Movable:HighFloor _Falling:HighFloor _Player:Lower no _Falling:Lower _Subtile:Subtile ] -> [ Movable:HighFloor _Falling:HighFloor _Subtile:Subtile CrushedPlayerSprite:Lower:Subtile no _Connector:Lower no _Moving:Lower ]
 _ Subtile [ CrushedPlayerSprite:_ | _Player:_ _Subtile:Subtile ] -> [ CrushedPlayerSprite:_ | _Subtile:Subtile CrushedPlayerSprite:_:Subtile no _Connector:Lower no _Moving:Lower ]
 
 HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:directions:HighFloor no Movable:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _Connector:directions:Lower ]
