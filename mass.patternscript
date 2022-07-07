@@ -1327,9 +1327,6 @@ Movable:_1 = _Jelly:_1 or _Player:_1
 Movable:_2 = _Jelly:_2 or _Player:_2
 Movable = Movable:_
 
-Support:_1 = _Jelly:_0 or Floor:_1
-Support:_2 = _Jelly:_1 or Floor:_2
-
 _ConnectorVertical:_0 = _ConnectorHigh:_0
 _ConnectorVertical:_1 = _ConnectorHigh:_1
 _ConnectorVertical:_2 = _ConnectorHigh:_2
@@ -1757,9 +1754,9 @@ endloop
 startloop
   ( Objects above falling objects and objects without support can fall )
   HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor _FallingResolved:Lower _Falling:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _FallingMovingResolved:Lower _Falling:Lower ]
-  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor no Support:HighFloor ] -> [ Movable:HighFloor _Falling:HighFloor _FallingMovingResolved:HighFloor ]
-  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor Support:HighFloor _FallingResolved:Lower no _Falling:Lower ] -> [ Movable:HighFloor _FallingMovingResolved:HighFloor Support:HighFloor _FallingResolved:Lower ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor no _Jelly:Lower no Floor:HighFloor ] -> [ Movable:HighFloor _Falling:HighFloor _FallingMovingResolved:HighFloor ]
   HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor Floor:HighFloor no _Falling:Lower ] -> [ Movable:HighFloor _FallingMovingResolved:HighFloor Floor:HighFloor ]
+  HighFloor [ Movable:HighFloor no _FallingMovingResolved:HighFloor _Jelly:Lower _FallingResolved:Lower no _Falling:Lower ] -> [ Movable:HighFloor _FallingMovingResolved:HighFloor _Jelly:Lower _FallingResolved:Lower ]
   
   ( Objects that aren't completely marked as falling get reverted because they have some support )
   _ [ Movable:_ no _Falling:_ _FallingMovingResolved:_ _Connector:>:_ | _Falling:_ ] -> [ Movable:_ _Connector:>:_ _FallingMovingResolved:_ | _FallingMovingResolved:_ ]
@@ -1858,8 +1855,8 @@ right _ [ _Player:_ _Connector:right:_ _Connector:down:_ | ] -> [ PlayerSprite:_
 right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | ] -> [ Jelly1x1Sprite:_:_BL _Jelly1x1:_ _Connector:right:_ _Connector:up:_ | Jelly1x1Sprite:_:_BR ]
 right _ [ _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | ] -> [ Jelly1x1Sprite:_:_TL _Jelly1x1:_ _Connector:right:_ _Connector:down:_ | Jelly1x1Sprite:_:_TR ]
 
-right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_BL _Jelly1x1TallLow:LowFloor _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_BR ]
-right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_TL _Jelly1x1TallLow:LowFloor _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_TR ]
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_BL _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:up:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_BR ]
+right LowFloor [ _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | ] -> [ Jelly1x1TallSprite:LowFloor:_TL _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher _Connector:right:LowFloor _Connector:down:LowFloor _ConnectorHigh:LowFloor | Jelly1x1TallSprite:LowFloor:_TR ]
 
 right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:up:_ | | | ] -> [ Jelly2x1Sprite:right:_:_BL _Jelly2x1:right:_ _Connector:right:_ _Connector:up:_ | Jelly2x1Sprite:right:_:_BR | Jelly2x1Sprite:left:_:_BL | Jelly2x1Sprite:left:_:_BR ]
 right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Connector:down:_ | | | ] -> [ Jelly2x1Sprite:right:_:_TL _Jelly2x1:right:_ _Connector:right:_ _Connector:down:_ | Jelly2x1Sprite:right:_:_TR | Jelly2x1Sprite:left:_:_TL | Jelly2x1Sprite:left:_:_TR ]
@@ -2017,26 +2014,29 @@ R = Exit:right:_0:_BL and Floor:_0
 ##########**################
 ##########Ḍ*################
 
-( TODO: place the exit such that you can't just build a bridge to it. )
-########################################
-########################################
-########################################
-########################################
-##**************########################
-##**************########################
-##****##************************¹¹######
-##****##************************¹¹######
-##********************..........│.######
-##**********▀*********..........│.######
-##**##**************************║*######
-##**##**ℙ*******▐*******╔═══════╝*######
-##********************..11........######
-##**********▐*▀*******..11........######
-##****##**************............######
-##****##**************........■...######
-##**************####**............######
-##**************####**............######
-####################************..******
-####################************..****Ṛ*
-########################################
-########################################
+level Three Seashells
+
+####################################
+####################################
+####################################
+####################################
+##********************..****¹¹######
+##********************..****¹¹######
+##****##**********....**....│.######
+##****##**********....**....│.######
+##****************..........│.######
+##********▀*******..........│.######
+##**##**********************║*######
+##**##******ℙ*▐*****╔═══════╝*######
+##****************..11........######
+##********▐*▀*****..11........######
+##****##**********............######
+##****##**********......■.....######
+##************##**............######
+##************##**............######
+################**********##..######
+################**********##..######
+########################****..******
+########################****..****ṛ*
+####################################
+####################################
