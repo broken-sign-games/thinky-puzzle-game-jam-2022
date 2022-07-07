@@ -798,9 +798,9 @@ copy: CrushedPlayerSprite:_1:Subtile translate:up:4
 
 Jelly1x1Sprite:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11110
-00111
-00111
+00221
+00112
+00112
 00001
 00001
 22112
@@ -810,9 +810,9 @@ Jelly1x1Sprite:_0:_BL
 
 Jelly1x1Sprite:_0:_BR
 #fbff86 #d5e04b #a2a947 
-01111
-11100
-11100
+11111
+21100
+21100
 10011
 10011
 22222
@@ -822,20 +822,20 @@ Jelly1x1Sprite:_0:_BR
 
 Jelly1x1Sprite:_0:_TL
 #fbff86 #d5e04b #a2a947 
-00111
-00111
+00110
+00110
 11111
 11111
-11110
+00221
 translate:up:4
 
 Jelly1x1Sprite:_0:_TR
 #fbff86 #d5e04b #a2a947 
-10011
-10011
+00000
+00000
+12200
+12200
 11111
-11111
-01111
 translate:up:4
 
 Jelly1x1Sprite:_1:Subtile
@@ -848,7 +848,7 @@ copy: Jelly1x1Sprite:_1:Subtile translate:up:4
 
 Jelly1x1TallSprite:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11110
+11112
 00111
 00111
 00001
@@ -864,7 +864,7 @@ Jelly1x1TallSprite:_0:_BL
 
 Jelly1x1TallSprite:_0:_BR
 #fbff86 #d5e04b #a2a947 
-01111
+21111
 11100
 11100
 10011
@@ -880,20 +880,20 @@ Jelly1x1TallSprite:_0:_BR
 
 Jelly1x1TallSprite:_0:_TL
 #fbff86 #d5e04b #a2a947 
-00111
-00111
-11111
-11111
-11110
+00001
+00001
+00221
+00221
+11112
 translate:up:8
 
 Jelly1x1TallSprite:_0:_TR
 #fbff86 #d5e04b #a2a947 
-10011
-10011
-11111
-11111
-01111
+10000
+10000
+11100
+11100
+21111
 translate:up:8
 
 Jelly1x1TallSprite:_1:Subtile
@@ -908,7 +908,7 @@ copy: Jelly1x1TallSprite:_1:Subtile translate:up:4
 ( Direction indicates which side contains the other half )
 Jelly2x1Sprite:right:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11111
+00221
 00111
 00111
 00001
@@ -920,9 +920,9 @@ Jelly2x1Sprite:right:_0:_BL
 
 Jelly2x1Sprite:right:_0:_BR
 #fbff86 #d5e04b #a2a947 
-11100
 11111
-11111
+12211
+12211
 10000
 10000
 22222
@@ -932,25 +932,25 @@ Jelly2x1Sprite:right:_0:_BR
 
 Jelly2x1Sprite:right:_0:_TL
 #fbff86 #d5e04b #a2a947 
-00111
-00111
-11110
-11110
+00110
+00110
 11111
+11111
+00221
 translate:up:4
 
 Jelly2x1Sprite:right:_0:_TR
 #fbff86 #d5e04b #a2a947 
+00011
+00011
+11122
+11122
 11111
-11111
-01111
-01111
-11100
 translate:up:4
 
 Jelly2x1Sprite:left:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11110
+22112
 11111
 11111
 11001
@@ -962,9 +962,9 @@ Jelly2x1Sprite:left:_0:_BL
 
 Jelly2x1Sprite:left:_0:_BR
 #fbff86 #d5e04b #a2a947 
-01111
-11111
-11111
+21100
+12211
+12211
 10000
 10000
 21122
@@ -978,7 +978,7 @@ Jelly2x1Sprite:left:_0:_TL
 00111
 11111
 11111
-11110
+22112
 translate:up:4
 
 Jelly2x1Sprite:left:_0:_TR
@@ -987,48 +987,48 @@ Jelly2x1Sprite:left:_0:_TR
 10011
 11100
 11100
-01111
+21100
 translate:up:4
 
 Jelly2x1Sprite:down:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11110
+11221
 00111
 00111
-11111
-11111
+11112
+11112
 translate:up:4
 
 Jelly2x1Sprite:down:_0:_BR
 #fbff86 #d5e04b #a2a947 
-01111
+11111
 11100
 11100
-10011
-10011
+21111
+21111
 translate:up:4
 
 Jelly2x1Sprite:down:_0:_TL
 #fbff86 #d5e04b #a2a947 
-00111
-00111
-00111
-00111
-11110
+00110
+00110
+00112
+00112
+11221
 translate:up:4
 
 Jelly2x1Sprite:down:_0:_TR
 #fbff86 #d5e04b #a2a947 
-10011
-10011
+00000
+00000
+21100
+21100
 11111
-11111
-01111
 translate:up:4
 
 Jelly2x1Sprite:up:_0:_BL
 #fbff86 #d5e04b #a2a947 
-11111
+11112
 00111
 00111
 00001
@@ -1040,7 +1040,7 @@ Jelly2x1Sprite:up:_0:_BL
 
 Jelly2x1Sprite:up:_0:_BR
 #fbff86 #d5e04b #a2a947 
-11111
+21111
 11100
 11100
 10011
@@ -1054,18 +1054,18 @@ Jelly2x1Sprite:up:_0:_TL
 #fbff86 #d5e04b #a2a947 
 00111
 00111
-00110
-00110
-11111
+00111
+00111
+11112
 translate:up:4
 
 Jelly2x1Sprite:up:_0:_TR
 #fbff86 #d5e04b #a2a947 
-11111
-11111
-01111
-01111
-11111
+12200
+12200
+11100
+11100
+21111
 translate:up:4
 
 Jelly2x1Sprite:directions:_1:Subtile
@@ -1944,7 +1944,7 @@ R = Exit:right:_0:_BL and Floor:_0
 ##**************........##
 ##********▀*****........##
 ##**************........##
-##****▐***▀*****........##
+##****▐***▀***‼*........##
 ##**************........##
 ##ℙ*************........##
 ##########################
