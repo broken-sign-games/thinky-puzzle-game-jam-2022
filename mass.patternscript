@@ -905,6 +905,9 @@ transparent
 _Falling:_
 transparent
 
+_Rising:_
+transparent
+
 _FallingResolved:_
 transparent
 
@@ -933,6 +936,21 @@ _Vacated:_
 pink
 
 _LiftGroup:LiftGroup
+transparent
+
+_LiftProcessing
+transparent
+
+_LiftProcessed
+transparent
+
+_WeightLow:_
+transparent
+
+_WeightHigh:_
+transparent
+
+_PlayerWeight
 transparent
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise. )
@@ -984,7 +1002,7 @@ P = PlayerSprite:_0:_BL and Floor:_0
 ╚ = Wire:up:_1:_BL and Wire:right:_1:_BL and Floor:_1
 ╝ = Wire:left:_1:_BL and Wire:up:_1:_BL and Floor:_1
 
-Wall:_0 = Floor:_1 or Floor:_2
+Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
 Wall:_2 = Floor:_2
 
@@ -1095,6 +1113,10 @@ MovementMarker = MovementMarker:_
 _Falling = _Falling:_
 _FallingResolved = _FallingResolved:_
 
+_WeightLow = _WeightLow:_
+_WeightHigh = _WeightHigh:_
+_Weight = _WeightLow or _WeightHigh
+
 _Subtile = _Subtile:Subtile
 
 Player = PlayerSprite:_:_BL
@@ -1133,12 +1155,15 @@ WallCover
 _Subtile
 _ -> Movable:_
 _LiftGroup:LiftGroup
+_LiftProcessing, _LiftProcessed
+_ -> _WeightLow:_, _WeightHigh:_
+_PlayerWeight
 _, directions -> _Blocked:directions:_
 _ -> _Moving:_, _Vacated:_
 _ -> _Squishing:_
 _CheckMovement
 _ -> MovementMarker:_
-_ -> _Falling:_
+_ -> _Falling:_, _Rising:_
 _ -> _FallingResolved:_
 _Temp
 _ -> _Temp:_
@@ -1225,7 +1250,25 @@ _ [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -
 
 [ Sprite ] -> [ ]
 
+( Process any rising markers from a previous turn )
+
+LowFloor directions [ Movable:LowFloor _Rising:Higher _Connector:directions:LowFloor no Movable:Higher ] -> [ Movable:LowFloor _Rising:Higher _Connector:directions:Higher ]
++ [ Movable:_0 _Rising:_1 _ConnectorHigh:_0 no Movable:_1 ] -> [ Movable:_0 _Rising:_1 _ConnectorHigh:_1 ]
++ LowFloor [ _Player:LowFloor _Rising:Higher no Movable:Higher no _Connector:LowFloor ] -> [ _Player:Higher ]
++ LowFloor [ _Jelly1x1:LowFloor _Rising:Higher no Movable:Higher no _Connector:LowFloor ] -> [ _Jelly1x1:Higher ]
++ LowFloor Axes [ _Jelly2x1:Axes:LowFloor _Rising:Higher no Movable:Higher no _Connector:LowFloor ] -> [ _Jelly2x1:Axes:Higher ]
++ [ _Jelly1x1TallLow:_0 _Rising:_1 no Movable:_1 no _Connector:_0 ] -> [ _Jelly1x1TallLow:_1 ]
++ [ _Jelly1x1TallHigh:_1 _Rising:_2 no Movable:_2 no _Connector:_1 ] -> [ _Jelly1x1TallHigh:_2 ]
+
+directions [ Lift:_0 _Rising:_0 LiftEdge:directions:_0 ] -> [ Lift:_0 _Rising:_0 LiftEdge:directions:_1 ]
+directions [ Lift:_0 _Rising:_0 LiftCorner:directions:_0 ] -> [ Lift:_0 _Rising:_0 LiftCorner:directions:_1 ]
+Subtile [ Lift:_0 _Rising:_0 LiftDeco:_0:Subtile ] -> [ Lift:_1 LiftDeco:_1:Subtile ]
+
 ( Process any falling markers from a previous turn )
+directions [ Lift:_1 _Falling:_0 LiftEdge:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftEdge:directions:_0 ]
+directions [ Lift:_1 _Falling:_0 LiftCorner:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftCorner:directions:_0 ]
+Subtile [ Lift:_1 _Falling:_0 LiftDeco:_1:Subtile ] -> [ Lift:_0 LiftDeco:_0:Subtile ]
+
 HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:directions:HighFloor no Movable:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _Connector:directions:Lower ]
 + [ Movable:_1 _Falling:_1 _ConnectorHigh:_1 no Movable:_0 ] -> [ Movable:_1 _Falling:_1 _ConnectorHigh:_0 ]
 + HighFloor [ _Player:HighFloor _Falling:HighFloor no Movable:Lower no _Connector:HighFloor ] -> [ _Player:Lower ]
@@ -1234,6 +1277,7 @@ HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:direction
 + [ _Jelly1x1TallLow:_1 _Falling:_1 no Movable:_0 no _Connector:_1 ] -> [ _Jelly1x1TallLow:_0 ]
 + [ _Jelly1x1TallHigh:_2 _Falling:_2 no Movable:_1 no _Connector:_2 ] -> [ _Jelly1x1TallHigh:_1 ]
 
+((( Process player and jelly movement )))
 _ [ Movable:_ no Status:_ ] -> [ Movable:_ _Unprocessed:_ ]
 
 ( Can't nest loops in PS, so we have to put everything in a single loop and group things manually )
@@ -1418,7 +1462,83 @@ startloop
   LowFloor [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingResolved:LowFloor _ConnectorHigh:LowFloor no _Falling:Higher no _FallingResolved:Higher ] -> [ _Jelly1x1TallLow:LowFloor _Falling:LowFloor _FallingResolved:LowFloor _ConnectorHigh:LowFloor _Falling:Higher _FallingResolved:Higher ]
 endloop
 
-( If anything is falling, we resolve that in an again turn )
+((( Process lifts )))
+( Known limitations: make sure lifts are sufficiently far apart that no movable could be
+  supported by two separate lift groups, regardless of whether they are connected. In particular,
+  movables should not be falling onto rising lifts or movables.)
+
+startloop
+  ( Mark a random pair of lifts for processing )
+  random LiftGroup [ Lift:_0 _LiftGroup:LiftGroup no _LiftProcessed ] [ Lift:_1 _LiftGroup:LiftGroup no _LiftProcessed ] -> [ Lift:_0 _LiftGroup:LiftGroup _LiftProcessing ] [ Lift:_1 _LiftGroup:LiftGroup _LiftProcessing ]
+  LiftGroup LowFloor [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing | Lift:LowFloor _LiftGroup:LiftGroup no _LiftProcessing ] -> [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing | Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing ]
+  
+  ( Add weight to jellies on low lift. Player weight is irrelevant on the low lift. )
+  [ Lift:_0 _LiftProcessing _Jelly:_0 ] -> [ Lift:_0 _LiftProcessing _Jelly:_0 _WeightLow:_0 ]
+  
+  _ [ _Jelly:_ _Connector:>:_ _WeightLow:_ | ] -> [ _Jelly:_ _Connector:>:_ _WeightLow:_ | _WeightLow:_ ]
+  + LowFloor [ _Jelly:LowFloor _Jelly:Higher _WeightLow:LowFloor ] -> [ _Jelly:LowFloor _Jelly:Higher _WeightLow:LowFloor _WeightLow:Higher ]
+  
+  ( Add weight to falling movables on high lift. )
+  [ Lift:_1 _LiftProcessing Movable:_1 _Falling:_1 ] -> [ Lift:_1 _LiftProcessing Movable:_1 _Falling:_1 _WeightHigh:_1 ]
+  
+  _ [ Movable:_ _Connector:>:_ _WeightHigh:_ | ] -> [ Movable:_ _Connector:>:_ _WeightHigh:_ | _WeightHigh:_ ]
+  + [ _Jelly:_1 Movable:_2 _WeightHigh:_1 ] -> [ _Jelly:_1 Movable:_2 _WeightHigh:_1 _WeightHigh:_2 ]
+  
+  ( Replace player weight with special marker as it's only used for breaking ties. )
+  _ [ _Player:_ _WeightHigh:_ ] -> [ _Player:_ _PlayerWeight ]
+  
+  ( Cancel equal weights )
+  [ _WeightLow ] [ _WeightHigh ] -> [ ] [ ]
+  
+  ( If there is no weight left on the low lift, we turn the player weight into a proper weight 
+    to break a potential tie. The actual floor level of this weight doesn't matter. )
+  [ _WeightLow ] [ _Player no _Temp ] -> [ _WeightLow ] [ _Player _Temp ]
+  [ _PlayerWeight no _Temp ] -> [ _WeightHigh:_0 ]
+  [ _Temp ] -> [ ]
+  [ _PlayerWeight ] -> [ ]
+
+  ( If there is any weight left on the high lift, mark the low lift and all movables supported by
+    it as rising. Rising is indicated on the floor level things will rise to, since the lifts are
+    technically below the floor _0. )
+  [ _WeightHigh ] [ Lift:_0 _LiftProcessing ] -> [ _WeightHigh ] [ Lift:_0 _LiftProcessing _Rising:_0 _Processing:_0 ]
+  [ Lift:_0 _LiftProcessing _Rising:_0 _Processing:_0 Movable:_0 ] -> [ Lift:_0 _LiftProcessing _Rising:_0 _Processing:_0 Movable:_0 _Rising:_1 _Processing:_1 ]
+  
+  LowFloor [ Movable:LowFloor _Connector:>:LowFloor _Rising:Higher _Processing:Higher | no _Rising:Higher ] -> [ Movable:LowFloor _Connector:>:LowFloor _Rising:Higher | _Rising:Higher _Processing:Higher ]
+  + [ _Jelly:_0 Movable:_1 _Rising:_1 _Processing:_1 ] -> [ _Jelly:_0 Movable:_1 _Rising:_1 _Processing:_1 _Rising:_2 _Processing:_2 ]
+  
+  ( If we were to raise a movable that's already on the top floor, we cancel all rising instead. )
+  random [ ] [ _Jelly:_1 Movable:_2 _Rising:_2 _Processing:_2 ] -> [ _Temp ] [ _Jelly:_1 Movable:_2 ]
+  _ [ _Temp ] [ _Rising:_ _Processing:_ ] -> [ _Temp ] [ ]
+  [ _Temp ] -> [ ]
+  
+  ( If the low lift is rising, mark the high lift as falling. Note again that the lift's floor levels
+    are one below what a corresponding movable would be, so we use _Falling:_0. )
+  [ Lift:_0 _LiftProcessing _Rising:_0 ] [ Lift:_1 _LiftProcessing ] -> [ Lift:_0 _LiftProcessing _Rising:_0 ] [ Lift:_1 _LiftProcessing _Falling:_0 ]
+  
+  ( If the low lift isn't rising, we cancel the falling state of movables supported by the high lift. )
+  [ Lift:_0 _LiftProcessing no _Rising:_0 ] [ Lift:_1 _LiftProcessing Movable:_1 _Falling:_1 ] -> [ Lift:_0 _LiftProcessing ] [ Lift:_1 _LiftProcessing Movable:_1 _Processing:_1 ]
+  
+  _ [ Movable:_ _Connector:>:_ _Processing:_ no _Falling:_ | _Falling:_ ] -> [ Movable:_ _Connector:>:_ _Processing:_ | _Processing:_ ]
+  + [ _Jelly:_1 Movable:_2 _Processing:_1 no _Falling:_1 _Falling:_2 ] -> [ _Jelly:_1 Movable:_2 _Processing:_1 _Processing:_2 ]
+  
+  [ _Processing:_ ] -> [ ]
+  [ _Weight ] -> [ ]
+  [ _LiftProcessing ] -> [ _LiftProcessed ]
+endloop
+
+[ _LiftProcessed ] -> [ ]
+
+( If two objects would be rising/falling into the same space, we cancel the falling one and propagate this
+  new support upwards )
+LowFloor [ _Rising:LowFloor _Falling:Higher ] -> [ _Rising:LowFloor _Processing:Higher ]
+  
+_ [ Movable:_ _Connector:>:_ _Processing:_ no _Falling:_ | _Falling:_ ] -> [ Movable:_ _Connector:>:_ _Processing:_ | _Processing:_ ]
++ [ _Jelly:_1 Movable:_2 _Processing:_1 no _Falling:_1 _Falling:_2 ] -> [ _Jelly:_1 Movable:_2 _Processing:_1 _Processing:_2 ]
+
+[ _Processing:_ ] -> [ ]
+
+( If anything is still falling or raising, we resolve that in an again turn. Don't need to check _Rising
+  because nothing can be raised without something falling. )
 [ _Falling ] -> again
 [ _FallingResolved ] -> [ ]
 
@@ -1550,6 +1670,29 @@ P = PlayerSprite:_0 and Floor:_0
 ##****⁴⁴╚═════╝*┌─44....##
 ##****⁴⁴********│.44....##
 ##ℙ***⁴⁴════════┘.44....##
+##########################
+##########################
+
+##########################
+##########################
+##########################
+##########################
+##########################
+##########################
+##**************##########
+##**************##########
+##**************1111....##
+##**************1111....##
+##**************1111....##
+##****‼***▐*****1111....##
+##**************........##
+##**************........##
+##**************¹¹¹¹....##
+##****□***▀*****¹¹¹¹....##
+##**************¹¹¹¹....##
+##ℙ*************¹¹¹¹....##
+##************############
+##************############
 ##########################
 ##########################
 
