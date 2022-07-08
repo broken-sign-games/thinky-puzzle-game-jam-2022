@@ -9,6 +9,8 @@ game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
 run_rules_on_level_start
 
+noaction
+
 =====
 TAGS
 =====
@@ -763,44 +765,64 @@ PlayerSprite:_2:Subtile
 copy: PlayerSprite:_1:Subtile translate:up:4
 
 CrushedPlayerSprite:_0:_BL
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-11334
-11222
-11222
-..111
-..111
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
+33333
+44333
+44333
+..444
+..444
 
 CrushedPlayerSprite:_0:_BR
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-43311
-21111
-21111
-111..
-111..
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
+33333
+33333
+33333
+433..
+433..
 
 CrushedPlayerSprite:_0:_TL
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-..005
-..005
-11444
-11444
-11334
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
+....551
+....551
+2233333
+2233333
+..33333
 
 CrushedPlayerSprite:_0:_TR
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
-566..
-566..
-44411
-44411
-43311
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
+111....
+111....
+3333322
+3333322
+33333..
 
 CrushedPlayerSprite:_1:Subtile
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
 copy: CrushedPlayerSprite:_0:Subtile translate:up:4
 
 CrushedPlayerSprite:_2:Subtile
-#2e222f #c7dcd0 #ffffff #323353 #fdcbb0 #7f708a #3e3546 
+#484a77 #3e3546 #fdcbb0 #c7dcd0 #ffffff #2e222f 
 copy: CrushedPlayerSprite:_1:Subtile translate:up:4
+
+CrushedPlayerHandSpriteLeft:_0
+#fdcbb0
+.....
+.....
+...00
+...00
+.....
+
+CrushedPlayerHandSpriteLeft:_1
+#fdcbb0
+copy: CrushedPlayerHandSpriteLeft:_0 translate:up:4
+
+CrushedPlayerHandSpriteLeft:_2
+#fdcbb0
+copy: CrushedPlayerHandSpriteLeft:_1 translate:up:4
+
+CrushedPlayerHandSpriteRight:_
+#fdcbb0
+copy: CrushedPlayerHandSpriteLeft:_ |
 
 Jelly1x1Sprite:_0:_BL
 #d5e04b #a2a947 #fbff86 
@@ -1301,9 +1323,9 @@ WireEdge:right = WireEdge:right:_BR or WireEdge:left:_TR
 WireEdge:up = WireEdge:left:_TL or WireEdge:left:_TR
 WireEdge:down = WireEdge:left:_BL or WireEdge:left:_BR
 
-Sprite:_0 = PlayerSprite:_0:Subtile or CrushedPlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
-Sprite:_1 = PlayerSprite:_1:Subtile or CrushedPlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
-Sprite:_2 = PlayerSprite:_2:Subtile or CrushedPlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
+Sprite:_0 = PlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
+Sprite:_1 = PlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
+Sprite:_2 = PlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
 Sprite = Sprite:_
 
 CrushedPlayerSprite:_0 = CrushedPlayerSprite:_0:Subtile
@@ -1439,7 +1461,7 @@ LiftDeco:LowFloor:Subtile
 directions -> LiftEdge:directions:LowFloor
 directions -> LiftCorner:directions:LowFloor
 ToExit:directions:LowFloor:Subtile, Exit:directions:LowFloor:Subtile
-_ -> Sprite:_
+_ -> Sprite:_, CrushedPlayerSprite:_:Subtile, CrushedPlayerHandSpriteLeft:_, CrushedPlayerHandSpriteRight:_
 directions -> WallEdgeDark:directions:Subtile
 directions -> WallEdge:directions
 directions -> WallCorner:directions
@@ -1588,6 +1610,7 @@ Subtile [ Lift:_1 _Falling:_0 LiftDeco:_1:Subtile ] -> [ Lift:_0 LiftDeco:_0:Sub
 
 HighFloor Subtile [ Movable:HighFloor _Falling:HighFloor _Player:Lower no _Falling:Lower _Subtile:Subtile ] -> [ Movable:HighFloor _Falling:HighFloor _Subtile:Subtile CrushedPlayerSprite:Lower:Subtile no _Connector:Lower no _Moving:Lower ]
 _ Subtile [ CrushedPlayerSprite:_ | _Player:_ _Subtile:Subtile ] -> [ CrushedPlayerSprite:_ | _Subtile:Subtile CrushedPlayerSprite:_:Subtile no _Connector:Lower no _Moving:Lower ]
+right _ [ | CrushedPlayerSprite:_:_TL | CrushedPlayerSprite:_:_TR | ] -> [ CrushedPlayerHandSpriteLeft:_ | CrushedPlayerSprite:_:_TL | CrushedPlayerSprite:_:_TR | CrushedPlayerHandSpriteRight:_ ]
 
 HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:directions:HighFloor no Movable:Lower ] -> [ Movable:HighFloor _Falling:HighFloor _Connector:directions:Lower ]
 + [ Movable:_1 _Falling:_1 _ConnectorHigh:_1 no Movable:_0 ] -> [ Movable:_1 _Falling:_1 _ConnectorHigh:_0 ]
@@ -2251,6 +2274,42 @@ level Three Seashells
 ##################
 ##################
 
+
+##########################
+##########################
+##########################
+##########################
+##**************........##
+##**************........##
+##**************........##
+##**□***********........##
+##**************........##
+##********▀*****........##
+##**************........##
+##****▐***▀***‼*........##
+##**************........##
+##ℙ*************........##
+##########################
+##########################
+
+##########################
+##########################
+##########################
+##########################
+####******################
+####******################
+####************........##
+####************........##
+####************........##
+####**‼*********..!.....##
+####********************##
+####******▀*************##
+##**************........##
+##**************........##
+##**************........##
+##ℙ*************........##
+##########################
+##########################
 
 ##########################
 ##########################
