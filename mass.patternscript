@@ -1311,13 +1311,14 @@ R = Exit:right:_0:_BL and Floor:_0
 Ḷ = Exit:left:_1:_BL and Floor:_1
 Ṛ = Exit:right:_1:_BL and Floor:_1
 
-a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
-b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
-c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL
+b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL
+c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL
 e = Jelly1x1Sprite:_0:_BL and Lift:_0 and _LiftGroup:_1
 f = Jelly1x1Sprite:_0:_BL and Jelly1x1Sprite:_1:_BL and Floor:_1 and Lift:_0 and _LiftGroup:_1
 g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
 h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
+i = Jelly2x1Sprite:up:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:up:_1:_BL
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -1950,16 +1951,19 @@ LEVELS
 =======
 
 (
-P = PlayerSprite:_0 and Floor:_0
-ℙ = PlayerSprite:_1 and Floor:_1
-■ = Jelly1x1Sprite:_0 and Floor:_0
-□ = Jelly1x1Sprite:_1 and Floor:_1
-▌ = Jelly2x1Sprite:up:_0 and Floor:_0
-▐ = Jelly2x1Sprite:up:_1 and Floor:_1
-▄ = Jelly2x1Sprite:right:_0 and Floor:_0
-▀ = Jelly2x1Sprite:right:_1 and Floor:_1
-! = Jelly1x1TallSprite:_0 and Floor:_0
-‼ = Jelly1x1TallSprite:_1 and Floor:_1
+. = Floor:_0
+* = Floor:_1
+# = Wall
+P = PlayerSprite:_0:_BL and Floor:_0
+ℙ = PlayerSprite:_1:_BL and Floor:_1
+■ = Jelly1x1Sprite:_0:_BL and Floor:_0
+□ = Jelly1x1Sprite:_1:_BL and Floor:_1
+▌ = Jelly2x1Sprite:up:_0:_BL and Floor:_0
+▐ = Jelly2x1Sprite:up:_1:_BL and Floor:_1
+▄ = Jelly2x1Sprite:right:_0:_BL and Floor:_0
+▀ = Jelly2x1Sprite:right:_1:_BL and Floor:_1
+! = Jelly1x1TallSprite:_0:_BL and Floor:_0
+‼ = Jelly1x1TallSprite:_1:_BL and Floor:_1
 1 = Lift:_0 and _LiftGroup:_1
 ¹ = Lift:_1 and _LiftGroup:_1
 2 = Lift:_0 and _LiftGroup:_2
@@ -1968,18 +1972,22 @@ P = PlayerSprite:_0 and Floor:_0
 ³ = Lift:_1 and _LiftGroup:_3
 4 = Lift:_0 and _LiftGroup:_4
 ⁴ = Lift:_1 and _LiftGroup:_4
-─ = Wire:left:_0 and Wire:right:_0 and Floor:_0
-│ = Wire:up:_0 and Wire:down:_0 and Floor:_0
-┌ = Wire:down:_0 and Wire:right:_0 and Floor:_0
-┐ = Wire:left:_0 and Wire:down:_0 and Floor:_0
-└ = Wire:up:_0 and Wire:right:_0 and Floor:_0
-┘ = Wire:left:_0 and Wire:up:_0 and Floor:_0
-═ = Wire:left:_1 and Wire:right:_1 and Floor:_1
-║ = Wire:up:_1 and Wire:down:_1 and Floor:_1
-╔ = Wire:down:_1 and Wire:right:_1 and Floor:_1
-╗ = Wire:left:_1 and Wire:down:_1 and Floor:_1
-╚ = Wire:up:_1 and Wire:right:_1 and Floor:_1
-╝ = Wire:left:_1 and Wire:up:_1 and Floor:_1
+5 = Lift:_0 and _LiftGroup:_5
+⁵ = Lift:_1 and _LiftGroup:_5
+6 = Lift:_0 and _LiftGroup:_6
+⁶ = Lift:_1 and _LiftGroup:_6
+─ = Wire:left:_0:_BL and Wire:right:_0:_BL and Floor:_0
+│ = Wire:up:_0:_BL and Wire:down:_0:_BL and Floor:_0
+┌ = Wire:down:_0:_BL and Wire:right:_0:_BL and Floor:_0
+┐ = Wire:left:_0:_BL and Wire:down:_0:_BL and Floor:_0
+└ = Wire:up:_0:_BL and Wire:right:_0:_BL and Floor:_0
+┘ = Wire:left:_0:_BL and Wire:up:_0:_BL and Floor:_0
+═ = Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+║ = Wire:up:_1:_BL and Wire:down:_1:_BL and Floor:_1
+╔ = Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+╗ = Wire:left:_1:_BL and Wire:down:_1:_BL and Floor:_1
+╚ = Wire:up:_1:_BL and Wire:right:_1:_BL and Floor:_1
+╝ = Wire:left:_1:_BL and Wire:up:_1:_BL and Floor:_1
 U = Exit:up:_0:_BL and Floor:_0
 D = Exit:down:_0:_BL and Floor:_0
 L = Exit:left:_0:_BL and Floor:_0
@@ -1989,13 +1997,14 @@ R = Exit:right:_0:_BL and Floor:_0
 Ḷ = Exit:left:_1:_BL and Floor:_1
 Ṛ = Exit:right:_1:_BL and Floor:_1
 
-a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
-b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
-c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL
+b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL
+c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL
 e = Jelly1x1Sprite:_0:_BL and Lift:_0 and _LiftGroup:_1
 f = Jelly1x1Sprite:_0:_BL and Jelly1x1Sprite:_1:_BL and Floor:_1 and Lift:_0 and _LiftGroup:_1
 g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
 h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
+i = Jelly2x1Sprite:up:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:up:_1:_BL
 )
 
 title Moat
@@ -2170,6 +2179,33 @@ title Something's Off
 ######################
 ######################
 
+title Dynamite
+
+######################**####
+######################ụ*####
+######################**####
+######################**####
+######################**####
+######################**####
+##****¹¹¹¹****########....##
+##****¹¹¹¹****########....##
+######**║*############****##
+######**║*############****##
+######**║*############**11##
+######**║*############**11##
+####****║*****########1111##
+####****║***ℙ*########1111##
+####****║*****########11**##
+####**▐*i*****########11**##
+####****║*************1111##
+####****╚═════════════1111##
+######################****##
+######################****##
+######################****##
+######################****##
+############################
+############################
+
 title Skinner Box
 
 ########################
@@ -2289,7 +2325,7 @@ title The Elephant in the Room
 
 title Tight Corner
 
-######################
+##################**##
 ##################ụ*##
 ##################**##
 ##################**##
