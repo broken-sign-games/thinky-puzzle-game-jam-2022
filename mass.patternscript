@@ -1285,6 +1285,7 @@ R = Exit:right:_0:_BL and Floor:_0
 
 a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -1932,6 +1933,7 @@ R = Exit:right:_0:_BL and Floor:_0
 
 a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
+c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
 )
 
 level Moat
@@ -2041,7 +2043,7 @@ level Slalom
 ####################**######
 ####################ḍ*######
 
-level Matching Shapes
+level Contortionist
 
 ########################
 ########################
@@ -2062,7 +2064,7 @@ level Matching Shapes
 ########################
 ########################
 
-level Where did it go?
+level Vanishing Act
 
 ########################
 ########################
@@ -2155,6 +2157,31 @@ level Teapot
 ######********######**##
 ####################**##
 ####################ḍ*##
+
+level The Elephant in the Room
+
+############################
+############################
+############################
+############################
+####################****####
+####################****####
+##********........****¹¹####
+##**c═════────────════¹¹####
+##**║***####****######**####
+##**║***####****######**####
+##**11****##****######**####
+##**11****##****######**####
+##**11************####..####
+##**11************####..####
+##****************####**####
+##****************####**####
+##****************####**####
+##**ℙ***▐*▐*▐*****####**####
+##****************####******
+##****************####****ṛ*
+############################
+############################
 
 ########################
 ########################
