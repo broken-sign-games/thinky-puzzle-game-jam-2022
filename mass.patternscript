@@ -4,6 +4,8 @@ homepage menderbug.itch.io
 
 background_color #313638
 text_color #8fd3ff
+title_color #fbff86
+author_color #fbff86
 
 game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
@@ -1244,6 +1246,9 @@ transparent
 _PlayerWeight
 transparent
 
+_NoStepSound
+transparent
+
 _FirstTurn
 transparent
 
@@ -1454,7 +1459,7 @@ SOUNDS
 
 sfx0 39983908:12 ( Player moves )
 sfx1 31665207 ( Jelly moves )
-sfx2 64401708 ( Jelly gets squished ) ( 1641403 33271305 14609803 )
+sfx2 47284708:3 ( Jelly gets squished ) ( 64401708 1641403 33271305 14609803 )
 sfx3 71881304:15 ( Jelly lands after falling )
 sfx4 30350208:6 ( Lifts move ) ( 79021408 56244608 )
 sfx5 60897304:5 ( Player stopped by wall )
@@ -1522,6 +1527,7 @@ _FirstTurnDone
 _LS:LoopSection
 _, directions -> _Connector:directions:_
 _ConnectorVertical
+_NoStepSound
 __Nothing__
 
 ======
@@ -1633,12 +1639,14 @@ Subtile [ Lift:_0 _Rising:_0 LiftDeco:_0:Subtile ] -> [ Lift:_1 LiftDeco:_1:Subt
 
 ( Process any falling markers from a previous turn.
   If something falls onto the static player, they get crushed. )
+HighFloor [ _Player:HighFloor _Falling:HighFloor Floor:Lower ] -> sfx7
+HighFloor [ _Player:HighFloor _Falling:HighFloor Lift:Lower ] -> sfx7
+HighFloor [ _Jelly:HighFloor _Falling:HighFloor Floor:Lower ] -> sfx3
+HighFloor [ _Jelly:HighFloor _Falling:HighFloor Lift:Lower ] -> sfx3
+
 directions [ Lift:_1 _Falling:_0 LiftEdge:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftEdge:directions:_0 ]
 directions [ Lift:_1 _Falling:_0 LiftCorner:directions:_1 ] -> [ Lift:_1 _Falling:_0 LiftCorner:directions:_0 ]
 Subtile [ Lift:_1 _Falling:_0 LiftDeco:_1:Subtile ] -> [ Lift:_0 LiftDeco:_0:Subtile ]
-
-HighFloor [ _Player:HighFloor _Falling:HighFloor Floor:Lower ] -> sfx7
-HighFloor [ _Jelly:HighFloor _Falling:HighFloor Floor:Lower ] -> sfx3
 
 HighFloor Subtile [ Movable:HighFloor _Falling:HighFloor _Player:Lower no _Falling:Lower _Subtile:Subtile ] -> [ Movable:HighFloor _Falling:HighFloor _Subtile:Subtile CrushedPlayerSprite:Lower:Subtile no _Connector:Lower no _Moving:Lower ]
 _ Subtile [ CrushedPlayerSprite:_ | _Player:_ _Subtile:Subtile ] -> [ CrushedPlayerSprite:_ | _Subtile:Subtile CrushedPlayerSprite:_:Subtile no _Connector:Lower no _Moving:Lower ]
@@ -1702,7 +1710,7 @@ startloop
   ( Movables that are still marked as processing can move freely, so we perform the move and mark them as
     processed and blocked. To move all the things belonging to a movable, we move everything out of the moving
     cell into the empty cell, then move the movement marker and repeat. )
-  _ [ _LS:RM ] [ _Player:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Squishing:_ ] -> sfx0
+  _ [ _LS:RM no _NoStepSound ] [ _Player:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Squishing:_ ] -> sfx0
   _ [ _LS:RM ] [ _Jelly:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Squishing:_ ] -> sfx1
   _ [ _LS:RM ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Connector:_ no _Squishing:_ | no Movable:_ ] -> [ _LS:RM _Rerun ] [ Movable:_ _Moving:>:_ _Processing:_ | _Connector:_ ]
   + _ [ _LS:RM ] [ Movable:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ no _Squishing:_ | no Movable:_ ] -> [ _LS:RM _Rerun ] [ _Vacated:_ | Movable:_ _BlockedExcept:>:_ _Processed:_ no _Vacated:_ ]
@@ -1710,13 +1718,13 @@ startloop
   ( Squishing objects that are still marked as processing can squish freely. We handle the different squishing
     cases explicitly. )
   ( Squish 2x1 equally. We expand the front 1x1 into a 2x1 and then delete the rear 1x1. )
-  _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ no _Blocked:<:_ _Processing:_ _Squishing:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Processing:_ _Squishing:_ _Temp:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Processing:_ _Squishing:_ _Temp:_ ] sfx2
+  _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ no _Blocked:<:_ _Processing:_ _Squishing:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ ] -> [ _LS:RM _Rerun _NoStepSound ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Processing:_ _Squishing:_ _Temp:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Processing:_ _Squishing:_ _Temp:_ ] sfx2
   _ [ _LS:RM ] [ _Connector:>:_ no _Connector:<:_ _Temp:_ | _Connector:<:_ _Connector:>:_ _Temp:_ ] -> [ _LS:RM _Rerun ] [ _Connector:>:_ | _Connector:<:_ ]
   _ [ _LS:RM ] [ | _Jelly2x1:perpendicular:_ _Moving:<:_ no _Blocked:<:_ _Processing:_ _Squishing:_ _Connector:perpendicular:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ ]
   _ [ _LS:RM ] [ _Jelly2x1:parallel:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:>:_ | _Jelly2x1:parallel:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:>:_ | no _Squishing:_ no _Connector:<:_ ] -> [ _LS:RM _Rerun ] [ _Vacated:_ no _Connector:_ | _Vacated:_ no _Connector:_ | ]
 
   ( Squish 2x1 to one side. We expand the front 1x1 into a 2x1 and then delete the rear 1x1. )
-  _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ no _Connector:<:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ _Connector:>:_ | _TempJelly:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ no _Connector:>:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ _Connector:>:_ _Temp:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:<:_ _Connector:>:_ _Temp:_ | _TempJelly:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:<:_ ] sfx2
+  _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ no _Connector:<:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ _Connector:>:_ | _TempJelly:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ no _Connector:>:_ ] -> [ _LS:RM _Rerun _NoStepSound ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ _Connector:>:_ _Temp:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:<:_ _Connector:>:_ _Temp:_ | _TempJelly:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:<:_ ] sfx2
   _ [ _LS:RM ] [ _Jelly2x1:parallel:_ _Connector:>:_ no _Connector:<:_ _Temp:_ | _Connector:<:_ _Connector:>:_ _Temp:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel:_ _Connector:>:_ | _Connector:<:_ ]
   _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ _Connector:perpendicular:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ | _TempJelly:_ _Moving:>:_ no _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ no _Connector:>:_ | ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ _Connector:>:_ | _Jelly2x1:>:_ _FullyBlocked:_ _Processed:_ _Connector:perpendicular:_ _Connector:<:_ ]
   _ [ _LS:RM ] [ _Jelly2x1:parallel:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:>:_ | _Jelly2x1:parallel:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:>:_ | no _Squishing:_ no _Connector:<:_ ] -> [ _LS:RM _Rerun ] [ _Vacated:_ no _Connector:_ | _Vacated:_ no _Connector:_ | ]
@@ -1727,7 +1735,7 @@ startloop
   
   ( Squish 2x1 into a tall 1x1 if both sides are blocked. )
   ( TODO: Should block the squish if this happens on the top floor or there's an object on top of the front 1x1. )
-  LowFloor [ _LS:RM ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor ] sfx2
+  LowFloor [ _LS:RM ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun _NoStepSound ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor ] sfx2
   LowFloor [ _LS:RM ] [ _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:>:LowFloor no _Connector:<:LowFloor | _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor no _Connector:>:LowFloor ] -> [ _LS:RM _Rerun ] [ _Vacated:LowFloor no _Connector:LowFloor | _Vacated:LowFloor no _Connector:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:>:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:<:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher ]
   LowFloor directions [ _LS:RM ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor no _Connector:directions:Higher ] -> [ _LS:RM _Rerun ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor _Connector:directions:Higher ]
 
@@ -1818,6 +1826,8 @@ startloop
   _ [ _LS:CS > _RunSecondStep ] [ _Player:_ no _Moving:_ ] -> [ _LS:CS > _RunSecondStep ] [ _Player:_ _Moving:>:_ _Processing:_ ]
   [ _LS:CS _RunSecondStep ] -> [ _LS:FP ]
 endloop
+
+[ _NoStepSound ] -> [ ]
 
 ((( Drop unsupported objects )))
 
@@ -2156,7 +2166,7 @@ title Vanishing Act
 ########################
 ########################
 
-title Something's Off
+title How Odd
 
 ##################**##
 ##################ụ*##
@@ -2392,164 +2402,7 @@ title Finale
 ######################################################################
 ######################################################################
 
-########################
-########################
-########################
-########################
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-########################
-########################
-
 (
-################## 
-##################
-##################
-##################
-##..........****##
-##..........**□*##
-##......##....**##
-##......##....**##
-##..............##
-##■.p.▌...▄.....##
-##..............##
-##....■...▄.....##
-##..####....##..##
-##..####....##..##
-##################
-##################
-
-
-##########################
-##########################
-##########################
-##########################
-##**************........##
-##**************........##
-##**************........##
-##**□***********........##
-##**************........##
-##********▀*****........##
-##**************........##
-##****▐***▀***‼*........##
-##**************........##
-##ℙ*************........##
-##########################
-##########################
-
-##########################
-##########################
-##########################
-##########################
-####******################
-####******################
-####************........##
-####************........##
-####************........##
-####**‼*********..!.....##
-####********************##
-####******▀*************##
-##**************........##
-##**************........##
-##**************........##
-##ℙ*************........##
-##########################
-##########################
-
-##########################
-##########################
-##########################
-##########################
-##**************........##
-##**************........##
-##**************........##
-##**□***********........##
-##**************........##
-##********▀*****........##
-##**************........##
-##****▐***▀***‼*........##
-##**************........##
-##ℙ*************........##
-##########################
-##########################
-
-##########################
-##########################
-##########################
-##########################
-####******################
-####******################
-####************........##
-####************........##
-####************........##
-####**‼*********..!.....##
-####********************##
-####******▀*************##
-##**************........##
-##**************........##
-##**************........##
-##ℙ*************........##
-##########################
-##########################
-
-##########################
-##########################
-##########################
-##########################
-####**¹¹¹¹####....########
-####**¹¹¹¹####....########
-####**¹¹║*******..1111..##
-####**¹¹║*╔═══╗*..1111..##
-####****║*²²**│...1122..##
-####****║*²²**└───1122..##
-####**⁴⁴║*³³³³....443333##
-####**⁴⁴║*³³³³┌───443333##
-##****⁴⁴║*****║*..44....##
-##****⁴⁴╚═════╝*┌─44....##
-##****⁴⁴********│.44....##
-##ℙ***⁴⁴════════┘.44....##
-##########################
-##########################
-
-############**##############
-############**##############
-############**##############
-############Ụ*##############
-############**##############
-############**##############
-####**************##########
-####**************##########
-####**************1111....##
-####**************1111....##
-####**************1111....##
-####****‼***▐*****1111....##
-####**************........##
-####**************........##
-******************¹¹¹¹....##
-Ḷ*******□***▀*****¹¹¹¹....##
-####**************¹¹¹¹..####
-####ℙ*************¹¹¹¹..####
-####************######******
-####************######****Ṛ*
-##########**################
-##########**################
-##########**################
-##########Ḍ*################
-
 
 ########################
 ########################
