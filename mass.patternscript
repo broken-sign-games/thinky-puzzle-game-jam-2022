@@ -61,6 +61,12 @@ _BL _BR _TL _TR -> _BR _TR _BL _TL
 Subtile => RRot
 _BL _BR _TL _TR -> _TL _BL _TR _BR
 
+directions => LeftSubtile
+right up down left -> _TR _TL _BR _BL
+
+directions => RightSubtile
+right up down left -> _BR _TR _BL _TL
+
 ========
 OBJECTS
 ========
@@ -1289,6 +1295,11 @@ WireHigh:right = Wire:right:_1:Subtile
 WireHigh:up = Wire:up:_1:Subtile
 WireHigh:down = Wire:down:_1:Subtile
 
+WireEdge:left = WireEdge:left:_BL or WireEdge:left:_TL
+WireEdge:right = WireEdge:right:_BR or WireEdge:left:_TR
+WireEdge:up = WireEdge:left:_TL or WireEdge:left:_TR
+WireEdge:down = WireEdge:left:_BL or WireEdge:left:_BR
+
 Sprite:_0 = PlayerSprite:_0:Subtile or CrushedPlayerSprite:_0:Subtile or Jelly1x1Sprite:_0:Subtile or Jelly2x1Sprite:directions:_0:Subtile or Jelly1x1TallSprite:_0:Subtile
 Sprite:_1 = PlayerSprite:_1:Subtile or CrushedPlayerSprite:_1:Subtile or Jelly1x1Sprite:_1:Subtile or Jelly2x1Sprite:directions:_1:Subtile or Jelly1x1TallSprite:_1:Subtile
 Sprite:_2 = PlayerSprite:_2:Subtile or CrushedPlayerSprite:_2:Subtile or Jelly1x1Sprite:_2:Subtile or Jelly2x1Sprite:directions:_2:Subtile or Jelly1x1TallSprite:_2:Subtile
@@ -1521,7 +1532,8 @@ Subtile [ _FirstTurn ] [ Wall _Subtile:Subtile | no Wall ] -> [ _FirstTurn ] [ W
 right directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_BR Floor:LowFloor ]
 up directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BL | Wire:directions:LowFloor:_TL Floor:LowFloor ]
 up directions LowFloor [ _FirstTurn ] [ Wire:directions:LowFloor:_BR | Floor:LowFloor ] -> [ _FirstTurn ] [ Wire:directions:LowFloor:_BR | Wire:directions:LowFloor:_TR Floor:LowFloor ]
-directions Subtile [ _FirstTurn ] [ FloorEdge:directions WireHigh:directions _Subtile:Subtile ] -> [ _FirstTurn ] [ FloorEdge:directions WireHigh:directions _Subtile:Subtile WireEdge:directions:Subtile ]
+[ _FirstTurn ] [ FloorEdge:> Wire:>:_1:LeftSubtile ] -> [ _FirstTurn ] [ FloorEdge:> Wire:>:_1:LeftSubtile WireEdge:>:LeftSubtile ]
+[ _FirstTurn ] [ FloorEdge:> Wire:>:_1:RightSubtile ] -> [ _FirstTurn ] [ FloorEdge:> Wire:>:_1:RightSubtile WireEdge:>:RightSubtile ]
 
 ( Expand player. We're handling movement manually, so we replace the movement input with a marker object. )
 _ [ _FirstTurn ] [ PlayerSprite:_:_BL ] -> [ _FirstTurn ] [ _Player:_ _Connector:right:_ _Connector:up:_ ]
@@ -1989,6 +2001,48 @@ level Magic Trick
 ##########################
 ##########################
 
+level Filler
+
+########################
+########################
+########################
+########################
+##******......****..**##
+##**□***......****..**##
+##****************##**##
+##****************##**##
+##****************##**##
+##**ℙ***▀*********##**##
+##************######**##
+##************######**##
+######****##########**##
+######****##########**##
+####################**##
+####################ḍ*##
+
+level Something's Off
+
+##################**##
+##################ụ*##
+##################**##
+##################**##
+##**********....##**##
+##**********....##**##
+##************..##**##
+##****□*******..##**##
+##********##****##**##
+##**▐*****##****##**##
+##**************##11##
+##*******¹¹*****##11##
+##****##*¹¹═══╗*##║*##
+##****##******║*##║*##
+##..**********║***║*##
+##..********ℙ*╚═══╝*##
+##....**********######
+##....**********######
+######################
+######################
+
 level Skinner Box
 
 ########################
@@ -2011,6 +2065,29 @@ level Skinner Box
 ######....└─────────┘.##
 ######................##
 ######................##
+########################
+########################
+
+########################
+########################
+########################
+########################
+##....................##
+##....................##
+##....................##
+##....................##
+##......********......##
+##......********......##
+##......********......##
+##......***¹¹***......##
+##......***¹¹***......##
+##......**║*****......##
+##......**╚═══**......##
+##......********......##
+##....................##
+##....................##
+##....................##
+##....................##
 ########################
 ########################
 
