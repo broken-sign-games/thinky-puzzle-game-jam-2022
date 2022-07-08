@@ -33,7 +33,7 @@ HighFloor = _1 _2
 ( Defining an abbreviation because this appears everywhere )
 _ = Floor
 
-LiftGroup = _1 _2 _3 _4
+LiftGroup = _1 _2 _3 _4 _5 _6
 
 ( Abbreviating these since they appear in almost every rule and just bloat the code otherwise.
 ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
@@ -1286,6 +1286,10 @@ P = PlayerSprite:_0:_BL and Floor:_0
 ³ = Lift:_1 and _LiftGroup:_3
 4 = Lift:_0 and _LiftGroup:_4
 ⁴ = Lift:_1 and _LiftGroup:_4
+5 = Lift:_0 and _LiftGroup:_5
+⁵ = Lift:_1 and _LiftGroup:_5
+6 = Lift:_0 and _LiftGroup:_6
+⁶ = Lift:_1 and _LiftGroup:_6
 ─ = Wire:left:_0:_BL and Wire:right:_0:_BL and Floor:_0
 │ = Wire:up:_0:_BL and Wire:down:_0:_BL and Floor:_0
 ┌ = Wire:down:_0:_BL and Wire:right:_0:_BL and Floor:_0
@@ -1843,7 +1847,7 @@ endloop
 startloop
   ( Mark a random pair of lifts for processing )
   random LiftGroup [ Lift:_0 _LiftGroup:LiftGroup no _LiftProcessed ] [ Lift:_1 _LiftGroup:LiftGroup no _LiftProcessed ] -> [ Lift:_0 _LiftGroup:LiftGroup _LiftProcessing ] [ Lift:_1 _LiftGroup:LiftGroup _LiftProcessing ]
-  LiftGroup LowFloor [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing | Lift:LowFloor _LiftGroup:LiftGroup no _LiftProcessing ] -> [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing | Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing ]
+  LiftGroup LowFloor [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing ] [ Lift:LowFloor _LiftGroup:LiftGroup no _LiftProcessing ] -> [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing ] [ Lift:LowFloor _LiftGroup:LiftGroup _LiftProcessing ]
   
   ( Add weight to jellies on low lift. Player weight is irrelevant on the low lift. )
   [ Lift:_0 _LiftProcessing _Jelly:_0 ] -> [ Lift:_0 _LiftProcessing _Jelly:_0 _WeightLow:_0 ]
@@ -2268,29 +2272,28 @@ title Three Seashells
 ####################################
 ####################################
 
+title Finale
 
-########################
-########################
-########################
-########################
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-##....................##
-########################
-########################
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+##554444555544445555666666555566664444555544555555446666##******¹¹####
+##554444555544445555666666555566664444555544555555446666##ℙ*□***¹¹####
+##551111335522551144442244441111664433662244333311441166##**####..####
+##551111335522551144442244441111664433662244333311441166##**####..####
+##554433444422553344334422441144335511662244115555552255##******²²####
+##554433444422553344334422441144335511662244115555552255##**▀***²²####
+##444422445511112266333322553344335511116666112222442255##**##########
+##444422445511112266333322553344335511116666112222442255##**##########
+##555522665533552266115511553344224422443366444433444455##******³³####
+##555522665533552266115511553344224422443366444433444455##**▀***³³####
+##664422665533552255115511443355224422443355113333553366##**##########
+##664422665533552255115511443355224422443355113333553366##**##########
+##664444664444445555666666444455556666445555444444555566##**112233****
+##664444664444445555666666444455556666445555444444555566##**112233**ṛ*
+######################################################################
+######################################################################
 
 (
 ################## 
