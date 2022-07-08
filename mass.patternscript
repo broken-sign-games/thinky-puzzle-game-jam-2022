@@ -3,7 +3,7 @@ author Menderbug
 homepage menderbug.itch.io
 
 background_color #313638
-text_color #4d9be6
+text_color #8fd3ff
 
 game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
@@ -1310,6 +1310,10 @@ R = Exit:right:_0:_BL and Floor:_0
 a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+e = Jelly1x1Sprite:_0:_BL and Lift:_0 and _LiftGroup:_1
+f = Jelly1x1Sprite:_0:_BL and Jelly1x1Sprite:_1:_BL and Floor:_1 and Lift:_0 and _LiftGroup:_1
+g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
+h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -1984,6 +1988,10 @@ R = Exit:right:_0:_BL and Floor:_0
 a = PlayerSprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 b = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:left:_1:_BL and Wire:right:_1:_BL and Floor:_1
 c = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:right:_1:_BL and Floor:_1
+e = Jelly1x1Sprite:_0:_BL and Lift:_0 and _LiftGroup:_1
+f = Jelly1x1Sprite:_0:_BL and Jelly1x1Sprite:_1:_BL and Floor:_1 and Lift:_0 and _LiftGroup:_1
+g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
+h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
 )
 
 title Moat
@@ -2283,6 +2291,7 @@ title Three Seashells
 ##....................##
 ########################
 ########################
+
 (
 ################## 
 ##################
@@ -2441,4 +2450,23 @@ title Three Seashells
 ##....................##
 ########################
 ########################
+
+itch.io cover image
+
+##################
+##################
+##################
+##################
+####**********####
+####**********####
+##111111**¹¹¹¹¹¹##
+##1111e1**¹¹h¹¹¹##
+##111111**¹¹¹¹¹¹##
+##e11111══¹¹¹¹¹¹##
+##111111**¹¹¹¹¹¹##
+##11e111**g¹¹¹¹¹##
+####**********####
+####**********####
+##################
+##################
 )
