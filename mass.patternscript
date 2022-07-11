@@ -11,8 +11,6 @@ game_uri https://menderbug.itch.io/isaac-and-the-conservation-of-mass
 
 run_rules_on_level_start
 
-noaction
-
 show_level_title_in_menu
 
 =====
@@ -42,6 +40,8 @@ ForwardPropagage ResolveMovement DetectCycles BlockCycles CleanupStep)
 LoopSection = FP RM DC BC CS
 
 directions1 = directions
+
+Step = _0 _1 _2 _3 _4 _5 _6 _7 _8
 
 Axes = right up
 
@@ -1259,6 +1259,9 @@ transparent
 _LS:LoopSection
 transparent
 
+_KonamiCode:Step
+transparent
+
 _Subtile:Subtile
 transparent
 
@@ -1528,12 +1531,15 @@ _LS:LoopSection
 _, directions -> _Connector:directions:_
 _ConnectorVertical
 _NoStepSound
+_KonamiCode:Step
 __Nothing__
 
 ======
 RULES
 ======
 
+((( Generate decorative visuals and helper objects for dealing with multi-tile objects. )))
+( All of this should only be done on the first turn when the level loads. )
 random [ ] -> [ _FirstTurn ]
 [ _FirstTurnDone ] [ _FirstTurn ] -> [ _FirstTurnDone ] [ ]
 
@@ -1609,6 +1615,8 @@ _ [ _FirstTurn ] [ _Jelly2x1:perpendicular:_ _Connector:>:_ _Connector:perpendic
 _ [ _FirstTurn ] [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ no _Temp:_ | | | ] -> [ _FirstTurn ] [ _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:>:_ _Connector:perpendicular:_ _Connector:<:_ _Temp:_ | _Jelly2x1:>:_ _Connector:<:_ _Connector:perpendicular:_ ]
 [ _FirstTurn ] [ _Temp:_ ] -> [ _FirstTurn ] [ ]
 
+((( The rest of the code is run on regular and again turns )))
+
 ( Clean up sprites )
 [ Sprite ] -> [ ]
 
@@ -1659,6 +1667,21 @@ HighFloor directions [ Movable:HighFloor _Falling:HighFloor _Connector:direction
 + HighFloor Axes [ _Jelly2x1:Axes:HighFloor _Falling:HighFloor no Movable:Lower no _Connector:HighFloor ] -> [ _Jelly2x1:Axes:Lower ]
 + [ _Jelly1x1TallLow:_1 _Falling:_1 no Movable:_0 no _Connector:_1 ] -> [ _Jelly1x1TallLow:_0 ]
 + [ _Jelly1x1TallHigh:_2 _Falling:_2 no Movable:_1 no _Connector:_2 ] -> [ _Jelly1x1TallHigh:_1 ]
+
+((( Process Konami code )))
+[ _KonamiCode:_8 ] [ action Player ] -> win
+
+[ _KonamiCode:_7 no _Temp ] [ right Player ] -> [ _KonamiCode:_8 _Temp ] [ right Player ]
+[ _KonamiCode:_6 no _Temp ] [ left Player ] -> [ _KonamiCode:_7 _Temp ] [ left Player ]
+[ _KonamiCode:_5 no _Temp ] [ right Player ] -> [ _KonamiCode:_6 _Temp ] [ right Player ]
+[ _KonamiCode:_4 no _Temp ] [ left Player ] -> [ _KonamiCode:_5 _Temp ] [ left Player ]
+[ _KonamiCode:_3 no _Temp ] [ down Player ] -> [ _KonamiCode:_4 _Temp ] [ down Player ]
+[ _KonamiCode:_2 no _Temp ] [ down Player ] -> [ _KonamiCode:_3 _Temp ] [ down Player ]
+[ _KonamiCode:_2 no _Temp ] [ up Player ] -> [ _KonamiCode:_2 _Temp ] [ up Player ]
+[ _KonamiCode:_1 no _Temp ] [ up Player ] -> [ _KonamiCode:_2 _Temp ] [ up Player ]
+[ _KonamiCode:Step no _Temp ] [ up Player ] -> [ _KonamiCode:_1 _Temp ] [ up Player ]
+[ _KonamiCode:Step no _Temp ] [ moving Player ] -> [ _KonamiCode:_0 _Temp ] [ moving Player ]
+[ _Temp ] -> [ ]
 
 ((( Process player and jelly movement )))
 
@@ -1949,7 +1972,7 @@ right _ Subtile [ _Jelly2x1:right:_ _Connector:right:_ no _Connector:left:_ _Con
 up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:right:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BL _Jelly2x1:up:_ _Connector:up:_ _Connector:right:_ | Jelly2x1Sprite:up:_:_TL | Jelly2x1Sprite:down:_:_BL | Jelly2x1Sprite:down:_:_TL ]
 up _ Subtile [ _Jelly2x1:up:_ _Connector:up:_ no _Connector:down:_ _Connector:left:_ | | | ] -> [ Jelly2x1Sprite:up:_:_BR _Jelly2x1:up:_ _Connector:up:_ _Connector:left:_ | Jelly2x1Sprite:up:_:_TR | Jelly2x1Sprite:down:_:_BR | Jelly2x1Sprite:down:_:_TR ]
 
-[ _FirstTurn ] -> [ _FirstTurnDone ]
+[ _FirstTurn ] -> [ _FirstTurnDone _KonamiCode:_0 ]
 
 ==============
 WINCONDITIONS
