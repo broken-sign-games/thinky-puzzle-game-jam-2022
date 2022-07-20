@@ -1168,6 +1168,9 @@ pink
 _Blocked:directions:_
 pink
 
+_BlockedRaise:LowFloor
+pink
+
 _Squishing:_
 yellow
 
@@ -1512,6 +1515,7 @@ _LiftProcessing, _LiftProcessed
 _ -> _WeightLow:_, _WeightHigh:_
 _PlayerWeight
 _, directions -> _Blocked:directions:_
+LowFloor -> _BlockedRaise:LowFloor
 _ -> _Moving:_, _Vacated:_
 _ -> _Squishing:_
 _CheckMovement
@@ -1756,11 +1760,17 @@ startloop
     objects and treat this the same as if it had been blocked immediately. )
   _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ no _Connector:<:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Processing:_ _Squishing:_ _Connector:<:_ _Connector:>:_ | _TempJelly:_ _Moving:>:_ _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:_ _Moving:<:_ _Blocked:<:_ _Processing:_ _Squishing:_ _Connector:>:_ | _Jelly2x1:perpendicular:_ _Moving:>:_ _Blocked:>:_ _Processing:_ _Squishing:_ _Connector:<:_ | no _Blocked:_ ]
   
-  ( Squish 2x1 into a tall 1x1 if both sides are blocked. )
+  ( Try to squish 2x1 into a tall 1x1 if both sides are blocked. )
+  ( However, if there's an object on top of the 2x1's front 1x1, the squish is blocked entirely. )
   ( TODO: Should block the squish if this happens on the top floor or there's an object on top of the front 1x1. )
-  LowFloor [ _LS:RM ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun _NoStepSound ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor ] sfx2
-  LowFloor [ _LS:RM ] [ _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:>:LowFloor no _Connector:<:LowFloor | _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor no _Connector:>:LowFloor ] -> [ _LS:RM _Rerun ] [ _Vacated:LowFloor no _Connector:LowFloor | _Vacated:LowFloor no _Connector:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:>:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:<:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher ]
+  LowFloor [ _LS:RM ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun _NoStepSound ] [ _Jelly2x1:perpendicular:LowFloor _Moving:<:LowFloor _Blocked:<:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor | _Jelly2x1:perpendicular:LowFloor _Moving:>:LowFloor _Blocked:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Temp:LowFloor ]
+  
+  LowFloor [ _LS:RM ] [ _Temp:LowFloor Movable:Higher ] -> [ _LS:RM ] [ _Temp:LowFloor Movable:Higher _BlockedRaise:LowFloor ]
+  LowFloor [ _LS:RM ] [ _BlockedRaise:LowFloor _Connector:>:LowFloor | no _BlockedRaise:LowFloor ] -> [ _LS:RM ] [ _BlockedRaise:LowFloor _Connector:>:LowFloor | _BlockedRaise:LowFloor ]
+  
+  LowFloor [ _LS:RM ] [ _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:>:LowFloor no _Connector:<:LowFloor no _BlockedRaise:LowFloor | _Jelly2x1:parallel:LowFloor _Moving:>:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor _Connector:>:LowFloor | _Jelly2x1:parallel:LowFloor _Temp:LowFloor _Processing:LowFloor _Squishing:LowFloor _Connector:<:LowFloor no _Connector:>:LowFloor ] -> [ _LS:RM _Rerun ] [ _Vacated:LowFloor no _Connector:LowFloor | _Vacated:LowFloor no _Connector:LowFloor | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:>:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher | _Jelly1x1TallLow:LowFloor _Jelly1x1TallHigh:Higher no _Moving:LowFloor _Connector:<:LowFloor _ConnectorHigh:LowFloor _Processed:LowFloor _Processed:Higher _FullyBlocked:LowFloor _FullyBlocked:Higher ] sfx2
   LowFloor directions [ _LS:RM ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor no _Connector:directions:Higher ] -> [ _LS:RM _Rerun ] [ _Jelly1x1TallLow:LowFloor _Connector:directions:LowFloor _ConnectorHigh:LowFloor _Connector:directions:Higher ]
+  [ _LS:RM ] [ _Temp:LowFloor ] -> [ _LS:RM ] [ ]
 
   ( If at this point a pending movable points at a vacated cell, we revert it to processing to check it again next
     iteration )
@@ -1779,6 +1789,9 @@ startloop
   _ [ _LS:RM ] [ RigidMovable:_ _Processing:_ _Moving:>:_ _Blocked:>:_ ] -> [ _LS:RM _Rerun ] [ RigidMovable:_ _Processed:_ _Blocked:>:_ ]
   ( As do 2x1 blocks moving along their short side )
   _ [ _LS:RM ] [ _Jelly2x1:perpendicular:_ _Processing:_ _Moving:>:_ _Blocked:>:_ no _Squishing:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:perpendicular:_ _Processed:_ _Blocked:>:_ ]
+  
+  ( And 2x1s unable to squish into a tall jelly )
+  LowFloor [ _LS:RM ] [ _Jelly2x1:LowFloor _Processing:LowFloor _Moving:>:LowFloor _BlockedRaise:LowFloor _Squishing:LowFloor ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:LowFloor _Processed:LowFloor _Blocked:>:LowFloor ]
 
   ( 2x1 blocks moving along their long side try to squish towards both sides )
   _ [ _LS:RM ] [ _Jelly2x1:parallel:_ _Processing:_ _Moving:>:_ _Blocked:>:_ _Connector:>:_ | _Moving:>:_ _Blocked:>:_ _Connector:>:_ | _Moving:>:_ _Blocked:>:_ _Connector:>:_ | _Moving:>:_ _Blocked:>:_ no _Connector:>:_ ] -> [ _LS:RM _Rerun ] [ _Jelly2x1:parallel:_ _Moving:>:_ no _Blocked:_ _Processing:_ _Squishing:_ _Connector:>:_ | _Moving:>:_ no _Blocked:_ _Squishing:_ _Connector:>:_ | _Squishing:_ _Connector:>:_ > _Temp:_ | _Squishing:_ > _Temp:_ ]
