@@ -1331,6 +1331,9 @@ g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
 h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
 i = Jelly2x1Sprite:up:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:up:_1:_BL
 j = Jelly1x1Sprite:_1:_BL and Lift:_1 and _LiftGroup:_1
+k = PlayerSprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL
+m = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL
+n = Wall and Wire:down:_1:_BL
 
 Wall:_0 = Floor:_1 or Floor:_2 or Lift:_1
 Wall:_1 = Floor:_2
@@ -2053,6 +2056,8 @@ g = Jelly2x1Sprite:right:_1:_BL and Lift:_1 and _LiftGroup:_1
 h = PlayerSprite:_1:_BL and Lift:_1 and _LiftGroup:_1
 i = Jelly2x1Sprite:up:_1:_BL and Floor:_1 and Wire:down:_1:_BL and Wire:up:_1:_BL
 j = Jelly1x1Sprite:_1:_BL and Lift:_1 and _LiftGroup:_1
+k = PlayerSprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL
+m = Jelly1x1Sprite:_1:_BL and Floor:_1 and Wire:up:_1:_BL and Wire:down:_1:_BL
 )
 
 title:none Moat
@@ -2707,6 +2712,47 @@ title:none The Bridge is Gone [by Neonesque]
 ##........................####
 ##############################
 ##############################
+
+title:none Labyrinth
+
+##########################
+##########################
+##########################
+##########################
+########³³##²²##¹¹########
+########³³##²²##¹¹########
+######**║***║***║***######
+######**║***║***║***######
+######**║***║***║***######
+######**m***m***m***######
+######**║***║***║***######
+######**║***║***║***######
+######**║***║***║***######
+######**║***k***║***######
+######**║***║***║***######
+######**║***║***║***######
+########║*##║*##║*########
+########║*##║*##║*########
+######333333│.111111######
+######333333│.111111######
+######33223322**2211######
+######33223322**2211######
+####333322222222221111####
+####333322222222221111####
+##****3322**22112211****##
+##****3322**22112211****##
+##**33333333..11111111**##
+##**33333333..11111111**##
+##**********************##
+##**********************##
+####********..********####
+####********..********####
+############**############
+############**############
+############**############
+############**############
+############**############
+############ḍ*############
 
 ( concept for microban 1 replacement 
 ################**####
